@@ -74,15 +74,22 @@ async def capture_images():
         capture_interval = 5  # seconds
         last_capture_time = time.time()
 
-        while not stop_img_capture:
+        print(stop_img_capture)
+        while not stop_img_capture and img_num<4:
+            img_num+=1
             in_rgb = q_rgb.get()
+            print("in_rgb")
+            print(in_rgb)
             if in_rgb is not None:
                 frame = in_rgb.getCvFrame()
-                current_time = time.time()
-                if current_time - last_capture_time >= capture_interval:
-                    last_capture_time = current_time
-                    encoded_image = get_image_data(frame)
-                    await sio.emit('robot_send_image', {'image_data': encoded_image})
+                print("frame")
+                print(frame)
+                # current_time = time.time()
+                # if current_time - last_capture_time >= capture_interval:
+                # last_capture_time = current_time
+                encoded_image = get_image_data(frame)
+                print(encoded_image)
+                await sio.emit('robot_send_image', {'index': img_num,'image_data': encoded_image})
 
             if cv2.waitKey(1) == ord('q'):
                 break
@@ -94,13 +101,10 @@ def get_image_data(frame):
 
 # async def send_images(frame):
 #     # replace with better looping logic
-#     for i in range(3):
-#         encoded_image = get_image_data(frame)
-#         await sio.emit('robot_send_image', {'index': i, 'image_data': encoded_image})
 
 async def main():
     # Connect the client to the server
-    await sio.connect('http://localhost:5000')
+    await sio.connect('http://100.66.219.234:5000')
 
     # Wait for events indefinitely
     await sio.wait()
