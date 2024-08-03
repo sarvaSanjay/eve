@@ -1,6 +1,5 @@
 import asyncio
 import base64
-from pathlib import Path
 from os import path
 import socketio
 
