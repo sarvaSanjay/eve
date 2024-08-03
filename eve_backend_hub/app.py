@@ -1,3 +1,6 @@
+import base64
+from os import path
+
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 
@@ -25,7 +28,7 @@ def handle_browser_connection(data):
     if robot_id in connected_robots:
         room = f"robot_{robot_id}"
         browsers_to_robots[browser_sid] = connected_robots[robot_id]
-        robots_to_browsers[connected_robots[robot_id]] = browsers_to_robots
+        robots_to_browsers[connected_robots[robot_id]] = browser_sid
         join_room(room)
         emit('browser_connected', {'message': f'Browser with sid {browser_sid} Connected to robot {robot_id}'}, room=room)
     else:
@@ -58,6 +61,18 @@ def handle_send_command(data):
     # Send different messages to the browser and robot
     emit('execute_command', {'command': command}, to=robot_sid)
     emit('acknowledge_command', {'message': f'Command "{command}" sent to robot'}, to=browser_sid)
+
+
+@socketio.on('robot_send_image')
+def handle_send_image(data):
+    robot_sid = request.sid
+    browser_sid = robots_to_browsers[robot_sid]
+    file_name = f'static/{data.get("index")}.jpeg'
+    file_name = path.join(path.dirname(path.realpath(__file__)), file_name)
+    with open(file_name, 'wb+') as f:
+        f.write(base64.b64decode(data.get('image_data')))
+    print(f'sending to browser sid: {browser_sid}')
+    emit('send_browser_image', data, to=browser_sid)
 
 
 # Event handler for when a robot disconnects

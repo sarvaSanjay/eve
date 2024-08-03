@@ -1,5 +1,7 @@
 import asyncio
-
+import base64
+from pathlib import Path
+from os import path
 import socketio
 
 # Define a unique robot ID
@@ -34,11 +36,27 @@ async def on_execute_command(data):
     command = data.get('command')
     print(f"Executing command: {command}")
     # Execute the command (replace with actual command handling logic)
+    if command == 'start_robot':
+        await send_images()
     result = f"Command '{command}' executed"
 
     # Optionally, send the result back to the server
     # sio.emit('command_result', {'robot_id': robot_id, 'result': result})
-    print(f"Result sent: {result}")
+    print(result)
+
+def get_image_data():
+    # Open the image file in binary mode
+    image_path = path.join(path.dirname(path.realpath(__file__)), 'static/robot/image.jpeg')
+    with open(image_path, "rb") as image_file:
+        # Encode the image data to base64
+        encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
+        return encoded_image
+
+async def send_images():
+    # replace with better looping logic
+    for i in range(3):
+        encoded_image = get_image_data()
+        await sio.emit('robot_send_image', {'index': i, 'image_data': encoded_image})
 
 async def main():
     # Connect the client to the server
@@ -46,5 +64,6 @@ async def main():
 
     # Wait for events indefinitely
     await sio.wait()
+
 
 asyncio.run(main())

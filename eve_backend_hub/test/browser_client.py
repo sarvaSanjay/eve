@@ -1,4 +1,7 @@
 import asyncio
+import base64
+from os import path
+
 import socketio
 
 # Define a unique robot ID
@@ -27,13 +30,21 @@ async def browser_connected(data):
 async def on_acknowledge_command(data):
     print(f"Message: {data.get('message')}")
 
+@sio.on('send_browser_image')
+async def send_browser_image(data):
+    file_name = f'static/browser/{data.get("index")}.jpeg'
+    file_name = path.join(path.dirname(path.realpath(__file__)), file_name)
+    print(f'received image {data.get("index")}')
+    with open(file_name, 'wb+') as f:
+        f.write(base64.b64decode(data.get('image_data')))
+
 
 async def main():
     # Connect the client to the server
     await sio.connect('http://localhost:5000')
 
     # Send start robot command
-    await sio.emit('send_command', {'command': 'start robot'})
+    await sio.emit('send_command', {'command': 'start_robot'})
 
     # Wait for events indefinitely
     await sio.wait()
