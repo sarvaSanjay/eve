@@ -6,6 +6,8 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Dictionary to track robot connections
 connected_robots = {}
+browsers_to_robots = {}
+robots_to_browsers = {}
 
 @app.route('/')
 def index():
@@ -22,8 +24,10 @@ def handle_browser_connection(data):
     # Check if the requested robot is connected
     if robot_id in connected_robots:
         room = f"robot_{robot_id}"
+        browsers_to_robots[browser_sid] = connected_robots[robot_id]
+        robots_to_browsers[connected_robots[robot_id]] = browsers_to_robots
         join_room(room)
-        emit('browser_connected', {'message': f'Connected to robot {robot_id}'}, room=room)
+        emit('browser_connected', {'message': f'Browser with sid {browser_sid} Connected to robot {robot_id}'}, room=room)
     else:
         emit('error', {'message': 'Robot not connected'})
 
@@ -40,23 +44,20 @@ def handle_robot_connection(data):
     room = f"robot_{robot_id}"
     join_room(room)
 
-    emit('robot_registered', {'message': f'Browser connected to robot {robot_id} registered successfully'}, room=room)
+    emit('robot_registered', {'message': f'Robot {robot_id} registered successfully'}, room=room)
 
 
 # Event handler to forward messages from browser to robot
 @socketio.on('send_command')
 def handle_send_command(data):
-    robot_id = data.get('robot_id')
     command = data.get('command')
     browser_sid = request.sid
-    print(f"Command received from Browser SID {browser_sid} for Robot ID {robot_id}: {command}")
-
-    room = f"robot_{robot_id}"
-    robot_sid = connected_robots.get(robot_id)
+    robot_sid = browsers_to_robots[browser_sid]
+    print(f"Command received from Browser SID {browser_sid} for Robot ID {robot_sid}: {command}")
 
     # Send different messages to the browser and robot
-    emit('execute_command', {'command': command}, room=robot_sid)
-    emit('acknowledgment', {'message': f'Command "{command}" sent to Robot {robot_id}'}, room=browser_sid)
+    emit('execute_command', {'command': command}, to=robot_sid)
+    emit('acknowledge_command', {'message': f'Command "{command}" sent to robot'}, to=browser_sid)
 
 
 # Event handler for when a robot disconnects
