@@ -11,10 +11,12 @@ import Gold from '../../public/Gold.png';
 
 const backgroundPattern = 'url("data:image/svg+xml,%3Csvg width=\'10\' height=\'10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%2398BF64\' fill-opacity=\'0.4\'%3E%3Ccircle cx=\'5\' cy=\'5\' r=\'2\'/%3E%3C/g%3E%3C/svg%3E")';
 
+
 const EcoReport = () => {
   return (
     <>
       <Paper
+        className="bg-gradient-to-r from-green-200 via-green-400 to-green-200"
         elevation={3}
         sx={{
           padding: '20px',
@@ -42,44 +44,33 @@ const EcoReport = () => {
           </Typography>
         </Box>
       </Paper>
-      <Grid container spacing={3} mt={4}>
-        <Grid item xs={6} textAlign="center">
-          <EnergyIcon sx={{ fontSize: 100, color: '#4caf50' }} />
-          <Typography variant="h5" component="h2" className='font-economica' gutterBottom>
-            Energy Efficiency
-          </Typography>
-          <Typography variant="h5" className='font-economica' color="textSecondary">
-            Good
-          </Typography>
-        </Grid>
-        <Grid item xs={6} textAlign="center">
-          <AirQualityIcon sx={{ fontSize: 100, color: '#4caf50' }} />
-          <Typography variant="h5" component="h2" className='font-economica' gutterBottom>
-            Indoor Air Quality
-          </Typography>
-          <Typography variant="h5" className='font-economica' color="textSecondary">
-            Very Good
-          </Typography>
-        </Grid>
-        <Grid item xs={6} textAlign="center">
-          <WasteIcon sx={{ fontSize: 100, color: '#4caf50' }} />
-          <Typography variant="h5" component="h2" className='font-economica' gutterBottom>
-            Resource & Waste Management
-          </Typography>
-          <Typography variant="h5" className='font-economica' color="textSecondary">
-            Excellent
-          </Typography>
-        </Grid>
-        <Grid item xs={6} textAlign="center">
-          <LocationIcon sx={{ fontSize: 100, color: '#4caf50' }} />
-          <Typography variant="h5" component="h2" className='font-economica' gutterBottom>
-            Location Analysis
-          </Typography>
-          <Typography variant="h5" className='font-economica' color="textSecondary">
-            Poor
-          </Typography>
-        </Grid>
-      </Grid>
+      <div className="p-6 bg-gray-100 min-h-screen">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
+      <EnergyIcon sx={{ fontSize: 100, color: '#4caf50' }} />
+      <h2 className="font-economica text-gray-800 mt-4 text-3xl">Energy Efficiency</h2>
+      <p className="font-economica text-green-600 text-xl">Good</p>
+    </div>
+    <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
+      <AirQualityIcon sx={{ fontSize: 100, color: '#4caf50' }} />
+      <h2 className="font-economica text-gray-800 mt-4  text-3xl">Indoor Air Quality</h2>
+      <p className="font-economica text-green-700 text-xl">Very Good</p>
+    </div>
+    <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
+    <WasteIcon sx={{ fontSize: 100, color: '#4caf50' }} />
+      <h2 className="font-economica text-gray-800 mt-4  text-3xl">Resource & Waste Management</h2>
+      <p className="font-economica text-green-800 text-xl">Excellent</p>
+    </div>
+    <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
+    <LocationIcon sx={{ fontSize: 100, color: '#4caf50' }} />
+      <h2 className="font-economica text-gray-800 mt-4  text-3xl">Location Analysis</h2>
+      <p className="font-economica text-red-600 text-xl">Poor</p>
+    </div>
+  </div>
+</div>
+
+
+
     </>
   );
 };
