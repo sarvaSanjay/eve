@@ -21,8 +21,16 @@ export default function Home() {
     energyEfficiency: '',
     indoorAirQuality: '',
     wasteManagement: '',
-    locationAnalysis: ''
+    locationAnalysis: '',
+    userRating: ''
   });
+  const [averageRatings, setAverageRatings] = useState({
+    avgEnergyEfficiency: '',
+    avgIndoorAirQuality: '',
+    avgWasteManagement: '',
+    avgLocationAnalysis: ''
+  });
+
   useEffect(() => {
     const socket = io('http://100.66.219.234:5000/'); // Replace with your server URL
 
@@ -58,13 +66,13 @@ export default function Home() {
         content={infoCardContent.indoorAirQuality || "Loading..."}
       />
 
-<InfoCard
+      <InfoCard
         icon={WasteIcon}
         title="RESOURCE AND WASTE MANAGEMENT"
         content={infoCardContent.wasteManagement || "Loading..."}
       />
 
-<InfoCard
+      <InfoCard
         icon={LocationIcon}
         title="LOCATION ANALYSIS"
         content={infoCardContent.locationAnalysis || "Loading..."}
