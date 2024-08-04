@@ -44,17 +44,17 @@ const EcoReport = ({ ecoChampion, ratings}) => {
     <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
       <EnergyIcon sx={{ fontSize: 100, color: '#4caf50' }} />
       <h2 className="font-economica text-gray-800 mt-4 text-3xl">Energy Efficiency</h2>
-      <p className="font-economica text-green-600 text-xl">{ratings.energyEfficiency}</p>
+      <p className="font-economica text-green-600 text-xl">{ratings.energyEfficiency.overall}</p>
     </div>
     <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
       <AirQualityIcon sx={{ fontSize: 100, color: '#4caf50' }} />
       <h2 className="font-economica text-gray-800 mt-4  text-3xl">Indoor Air Quality</h2>
-      <p className="font-economica text-green-700 text-xl">{ratings.indoorAirQuality}</p>
+      <p className="font-economica text-green-700 text-xl">{ratings.indoorAirQuality.overall}</p>
     </div>
     <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
     <WasteIcon sx={{ fontSize: 100, color: '#4caf50' }} />
       <h2 className="font-economica text-gray-800 mt-4  text-3xl">Resource & Waste Management</h2>
-      <p className="font-economica text-green-800 text-xl">{ratings.wasteManagement}</p>
+      <p className="font-economica text-green-800 text-xl">{ratings.resourceEfficiency.overall}</p>
     </div>
     <div className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg">
     <LocationIcon sx={{ fontSize: 100, color: '#4caf50' }} />

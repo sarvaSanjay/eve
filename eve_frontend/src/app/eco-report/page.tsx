@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import InfoCard from '@/components/Energy';
 import EcoReport from '@/components/HelloWorld';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Bolt as EnergyIcon,
   Home as AirQualityIcon,
@@ -11,7 +13,8 @@ import {
 
 export default function EcoReportPage() {
   const router = useRouter();
-  const { data } = router.query;
+  const searchParams = useSearchParams();
+  const queryData = searchParams.get('data')
 
   const [ecoChampion, setEcoChampion] = useState('');
   const [ratings, setRatings] = useState({
@@ -50,12 +53,6 @@ export default function EcoReportPage() {
     },
     finalRating: ''
   });
-  const [averageRatings, setAverageRatings] = useState({
-    avgEnergyEfficiency: '',
-    avgIndoorAirQuality: '',
-    avgResourceEfficiency: '',
-    avgFinalRating: ''
-  });
 
   useEffect(() => {
     // const socket = io('http://100.66.219.234:5000/'); // Replace with your server URL
@@ -65,11 +62,12 @@ export default function EcoReportPage() {
     // });
   
     // socket.on('send_eco_report', (data) => {
-    if (data){
-      const parsedData = JSON.parse(data as string);
-      setEcoChampion(parsedData["Final Rating"]["Rating"]); // Adjust according to your response structure
+    if (queryData){
+      const parsedData = JSON.parse(queryData as string);
+      console.log(queryData)
+      // setEcoChampion(parsedData["Final Rating"]["Rating"]); // Adjust according to your response structure
       setRatings({
-        energyEfficiency: {
+        energyEfficiency: { 
           lighting: parsedData["Energy Efficiency"]["Lighting"]["Rating"],
           appliancesAndElectronics: parsedData["Energy Efficiency"]["Appliances and Electronics"]["Rating"],
           overall: parsedData["Energy Efficiency"]["Overall"]["Rating"],
@@ -84,7 +82,7 @@ export default function EcoReportPage() {
           wasteManagement: parsedData["Resource Efficiency and Waste Management"]["Waste Management"]["Rating"],
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Rating"],
         },
-        finalRating: parsedData["Final Rating"]["Rating"],
+        finalRating: "",
       });
       setInfoCardContent({
         energyEfficiency: {
@@ -102,10 +100,10 @@ export default function EcoReportPage() {
           wasteManagement: parsedData["Resource Efficiency and Waste Management"]["Waste Management"]["Justification"],
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Justification"],
         },
-        finalRating: parsedData["Final Rating"]["Justification"],
+        finalRating: "",
       });
     }
-}, [data]);
+}, [queryData]);
 
   return (
     <div>
@@ -115,48 +113,42 @@ export default function EcoReportPage() {
         title="ENERGY EFFICIENCY"
         overallRating={ratings.energyEfficiency.overall}
         overallJustification={infoCardContent.energyEfficiency.overall}
-        subsections={{
-          "Lighting": {
-            rating: ratings.energyEfficiency.lighting,
-            justification: infoCardContent.energyEfficiency.lighting
-          },
-          "Appliances and Electronics": {
-            rating: ratings.energyEfficiency.appliancesAndElectronics,
-            justification: infoCardContent.energyEfficiency.appliancesAndElectronics
-          }
-        }}
+        sub_1= "Lighting"
+        sub_1_rating= {ratings.energyEfficiency.lighting}
+        sub_1_just={infoCardContent.energyEfficiency.lighting}
+        sub_2= "Appliances and Electronics"
+        sub_2_rating= {ratings.energyEfficiency.appliancesAndElectronics}
+        sub_2_just={infoCardContent.energyEfficiency.appliancesAndElectronics}
+        bgcolor='#98BF64'
+        iconcolor='#fff'
       />
       <InfoCard
         icon={AirQualityIcon}
         title="INDOOR AIR QUALITY"
         overallRating={ratings.indoorAirQuality.overall}
         overallJustification={infoCardContent.indoorAirQuality.overall}
-        subsections={{
-          "Air Quality": {
-            rating: ratings.indoorAirQuality.airQuality,
-            justification: infoCardContent.indoorAirQuality.airQuality
-          },
-          "Materials": {
-            rating: ratings.indoorAirQuality.materials,
-            justification: infoCardContent.indoorAirQuality.materials
-          }
-        }}
+        sub_1= "Air Quality"
+        sub_1_rating= {ratings.indoorAirQuality.airQuality}
+        sub_1_just={infoCardContent.indoorAirQuality.airQuality}
+        sub_2= "Materials"
+        sub_2_rating= {ratings.indoorAirQuality.materials}
+        sub_2_just={infoCardContent.indoorAirQuality.materials}
+        bgcolor='#fff'
+        iconcolor='#98BF64'
       />
       <InfoCard
         icon={WasteIcon}
         title="RESOURCE AND WASTE MANAGEMENT"
         overallRating={ratings.resourceEfficiency.overall}
         overallJustification={infoCardContent.resourceEfficiency.overall}
-        subsections={{
-          "Material Sustainability": {
-            rating: ratings.resourceEfficiency.materialSustainability,
-            justification: infoCardContent.resourceEfficiency.materialSustainability
-          },
-          "Waste Management": {
-            rating: ratings.resourceEfficiency.wasteManagement,
-            justification: infoCardContent.resourceEfficiency.wasteManagement
-          }
-        }}
+        sub_1= "Material Sustainability"
+        sub_1_rating= {ratings.resourceEfficiency.materialSustainability}
+        sub_1_just={infoCardContent.resourceEfficiency.materialSustainability}
+        sub_2= "Waste Management"
+        sub_2_rating= {ratings.resourceEfficiency.wasteManagement}
+        sub_2_just={infoCardContent.resourceEfficiency.wasteManagement}
+        bgcolor='#98BF64'
+        iconcolor='#fff'
       />
 
       {/* <InfoCard
@@ -164,16 +156,14 @@ export default function EcoReportPage() {
         title="LOCATION ANALYSIS"
         overallRating={ratings.energyEfficiency.overall}
         overallJustification={infoCardContent.energyEfficiency.overall}
-        subsections={{
-          "Lighting": {
-            rating: ratings.energyEfficiency.lighting,
-            justification: infoCardContent.energyEfficiency.lighting
-          },
-          "Appliances and Electronics": {
-            rating: ratings.energyEfficiency.appliancesAndElectronics,
-            justification: infoCardContent.energyEfficiency.appliancesAndElectronics
-          }
-        }}
+        sub_1= "Material Sustainability"
+        sub_1_rating= {ratings.resourceEfficiency.materialSustainability}
+        sub_1_just={infoCardContent.resourceEfficiency.materialSustainability}
+        sub_2= "Waste Management"
+        sub_2_rating= {ratings.resourceEfficiency.wasteManagement}
+        sub_2_just={infoCardContent.resourceEfficiency.wasteManagement}
+        bgcolor='#fff'
+        iconcolor='#98BF64'
       /> */}
       
     </div>
