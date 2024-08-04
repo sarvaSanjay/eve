@@ -4,11 +4,14 @@ import json
 
 import PIL.Image
 import google.generativeai as genai
+from dotenv import load_dotenv
 
 
 class ReportGenerator:
     def __init__(self):
+        load_dotenv()
         GEMINI_KEY = os.environ.get("GOOGLE_API_KEY")
+        print(GEMINI_KEY)
         genai.configure(api_key=GEMINI_KEY)
         self.model = genai.GenerativeModel("gemini-1.5-flash")
         self.chat = None
@@ -53,15 +56,17 @@ class ReportGenerator:
         #response = chat.send_message("generate your output")
         #print(response.text)
         #print(chat.history)
+        print("finished one shot")
 
     def prompt_gemini(self):
+        print("I am prompting")
         request = []
         for i in range(4):
             request.append(PIL.Image.open(path.join(self.static, f"{i+1}.jpeg")))
         request.append("Generate your response for these images. Remember to follow the same pattern as your previous response")
         response = self.chat.send_message(request)
         return response.text
-    
+
     def parse_text(self, text):
         lines = text.splitlines()
         result = {}
@@ -124,7 +129,11 @@ class ReportGenerator:
         return json_data
 
 
+    def get_eco_report(self):
+        return self.parse_text(self.prompt_gemini())
+
+
 if __name__ == '__main__':
-    rg = Report_Generator()
+    rg = ReportGenerator()
     rg.one_shot_prompt()
-    print(rg.prompt_gemini())
+    print(rg.get_eco_report())
