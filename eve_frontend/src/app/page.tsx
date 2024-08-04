@@ -53,7 +53,7 @@ const StartCommandPage = () => {
     {/* Connect Button */}
     <button
       onClick={handleConnectRobot}
-      className={`bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 mb-6 mr-10${
+      className={`bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 mb-6 mr-10${
         isConnected ? 'opacity-50 cursor-not-allowed' : ''
       }`}
       disabled={isConnected}
