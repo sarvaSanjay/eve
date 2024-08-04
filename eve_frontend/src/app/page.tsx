@@ -47,32 +47,33 @@ const StartCommandPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-green-50">
-      <div className="text-center bg-white p-8 rounded-lg shadow-lg border border-green-200">
-        <h1 className="text-2xl font-bold mb-6 text-green-800">Control Robot</h1>
-        
-        {/* Connect Button */}
-        <button
-          onClick={handleConnectRobot}
-          className={`bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 mb-4 ${
-            isConnected ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          disabled={isConnected}
-        >
-          {isConnected ? 'Connected' : 'Connect Robot'}
-        </button>
+  <div className="text-center bg-white p-8 rounded-lg shadow-lg border border-green-200">
+    <h1 className="text-2xl font-bold mb-6 text-green-800">Control Robot</h1>
+    
+    {/* Connect Button */}
+    <button
+      onClick={handleConnectRobot}
+      className={`bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 mb-6 mr-10${
+        isConnected ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
+      disabled={isConnected}
+    >
+      {isConnected ? 'Connected' : 'Connect Robot'}
+    </button>
 
-        {/* Start Robot Button */}
-        <button
-          onClick={handleStartRobot}
-          className={`bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 ${
-            !isConnected ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          disabled={!isConnected}
-        >
-          Start Robot
-        </button>
-      </div>
-    </div>
+    {/* Start Robot Button */}
+    <button
+      onClick={handleStartRobot}
+      className={`bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 ${
+        !isConnected ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
+      disabled={!isConnected}
+    >
+      Start Robot
+    </button>
+  </div>
+</div>
+
   );
 };
 
