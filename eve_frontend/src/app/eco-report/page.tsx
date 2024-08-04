@@ -36,6 +36,7 @@ export default function EcoReportPage() {
     location: {
       transport: '',
       green: '',
+      overall: ''
     },
     finalRating: ''
   });
@@ -61,6 +62,7 @@ export default function EcoReportPage() {
     location: {
       transport: '',
       green: '',
+      overall: ''
     }
   });
 
@@ -122,7 +124,8 @@ export default function EcoReportPage() {
         },
         location: {
           transport: parsedData["Proximity to Public Transport"]["Rating"],
-          green: parsedData["Proximity to Green Spaces"]["Ratings"],
+          green: parsedData["Proximity to Green Spaces"]["Rating"],
+          overall: parsedData["Overall"]["Rating"],
         },
         finalRating: "Green Advocate",
       });
@@ -148,6 +151,7 @@ export default function EcoReportPage() {
         location: {
           transport: parsedData["Proximity to Public Transport"]["Justification"],
           green: parsedData["Proximity to Green Spaces"]["Justification"],
+          overall: parsedData["Proximity to Green Spaces"]["Justification"],
         },
       });
     }
@@ -207,8 +211,8 @@ const handleAskQuestion = () => {
       <InfoCard
         icon={LocationIcon}
         title="LOCATION ANALYSIS"
-        overallRating={ratings.energyEfficiency.overall}
-        overallJustification={infoCardContent.energyEfficiency.overall}
+        overallRating={ratings.location.overall}
+        overallJustification={infoCardContent.location.overall}
         sub_1= "Proximity to Public Transport"
         sub_1_rating= {ratings.location.transport}
         sub_1_just={infoCardContent.location.transport}

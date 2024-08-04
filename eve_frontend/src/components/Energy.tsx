@@ -127,9 +127,6 @@ const InfoCard = ({ icon: Icon, title, overallRating, overallJustification, sub_
         </Grid>
       </Grid>
     </Paper>
-  
-
-  
 );
 };
 
