@@ -135,6 +135,10 @@ class ReportGenerator:
             'Proximity to Green Spaces': {
                 'Rating': 'Very Good',
                 'Justification':'The closes park is around 950m which is better than the average of 500m leading to better air quality and greener lifestyle!'
+            },
+            'Overall': {
+                'Rating': 'Very Good',
+                'Justification': 'This location is ideal being close to public transportation and green spaces giving you a chance to explore nature at its finest!'
             }
         }
         map_rating = {'Poor': 1, 'Good': 2, 'Very Good': 4, 'Excellent': 5}
