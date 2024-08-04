@@ -19,7 +19,6 @@ const EcoReport = ({ ecoChampion, ratings}) => {
         elevation={3}
         sx={{
           padding: '20px',
-          backgroundColor: '#98BF64',
           backgroundImage: backgroundPattern,
         }}
       >
