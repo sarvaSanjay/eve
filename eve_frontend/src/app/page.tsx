@@ -12,38 +12,95 @@ import io from 'socket.io-client';
 export default function Home() {
   const [ecoChampion, setEcoChampion] = useState('');
   const [ratings, setRatings] = useState({
-    energyEfficiency: '',
-    indoorAirQuality: '',
-    wasteManagement: '',
-    locationAnalysis: ''
+    energyEfficiency: {
+      lighting: '',
+      appliancesAndElectronics: '',
+      overall: ''
+    },
+    indoorAirQuality: {
+      airQuality: '',
+      materials: '',
+      overall: ''
+    },
+    resourceEfficiency: {
+      materialSustainability: '',
+      wasteManagement: '',
+      overall: ''
+    },
+    finalRating: ''
   });
   const [infoCardContent, setInfoCardContent] = useState({
-    energyEfficiency: '',
-    indoorAirQuality: '',
-    wasteManagement: '',
-    locationAnalysis: '',
-    userRating: ''
+    energyEfficiency: {
+      lighting: '',
+      appliancesAndElectronics: '',
+      overall: ''
+    },
+    indoorAirQuality: {
+      airQuality: '',
+      materials: '',
+      overall: ''
+    },
+    resourceEfficiency: {
+      materialSustainability: '',
+      wasteManagement: '',
+      overall: ''
+    },
+    finalRating: ''
   });
   const [averageRatings, setAverageRatings] = useState({
     avgEnergyEfficiency: '',
     avgIndoorAirQuality: '',
-    avgWasteManagement: '',
-    avgLocationAnalysis: ''
+    avgResourceEfficiency: '',
+    avgFinalRating: ''
   });
 
   useEffect(() => {
     const socket = io('http://100.66.219.234:5000/'); // Replace with your server URL
-
+  
     socket.on('connect', () => {
       console.log('Connected to WebSocket');
     });
-
-    socket.on('eco-report', (data) => {
-      setEcoChampion(data.ecoChampion);
-      setRatings(data.ratings);
-      setInfoCardContent(data.infoCards);
+  
+    socket.on('send_eco_report', (data) => {
+      setEcoChampion(data.FinalRating.Rating); // Adjust according to your response structure
+      setRatings({
+        energyEfficiency: {
+          lighting: data["Energy Efficiency"]["Lighting"]["Rating"],
+          appliancesAndElectronics: data["Energy Efficiency"]["Appliances and Electronics"]["Rating"],
+          overall: data["Energy Efficiency"]["Overall"]["Rating"],
+        },
+        indoorAirQuality: {
+          airQuality: data["Indoor Air Quality"]["Air Quality"]["Rating"],
+          materials: data["Indoor Air Quality"]["Materials"]["Rating"],
+          overall: data["Indoor Air Quality"]["Overall"]["Rating"],
+        },
+        resourceEfficiency: {
+          materialSustainability: data["Resource Efficiency and Waste Management"]["Material Sustainability"]["Rating"],
+          wasteManagement: data["Resource Efficiency and Waste Management"]["Waste Management"]["Rating"],
+          overall: data["Resource Efficiency and Waste Management"]["Overall"]["Rating"],
+        },
+        finalRating: data["Final Rating"]["Rating"],
+      });
+      setInfoCardContent({
+        energyEfficiency: {
+          lighting: data["Energy Efficiency"]["Lighting"]["Justification"],
+          appliancesAndElectronics: data["Energy Efficiency"]["Appliances and Electronics"]["Justification"],
+          overall: data["Energy Efficiency"]["Overall"]["Justification"],
+        },
+        indoorAirQuality: {
+          airQuality: data["Indoor Air Quality"]["Air Quality"]["Justification"],
+          materials: data["Indoor Air Quality"]["Materials"]["Justification"],
+          overall: data["Indoor Air Quality"]["Overall"]["Justification"],
+        },
+        resourceEfficiency: {
+          materialSustainability: data["Resource Efficiency and Waste Management"]["Material Sustainability"]["Justification"],
+          wasteManagement: data["Resource Efficiency and Waste Management"]["Waste Management"]["Justification"],
+          overall: data["Resource Efficiency and Waste Management"]["Overall"]["Justification"],
+        },
+        finalRating: data["Final Rating"]["Justification"],
+      });
     });
-
+  
     socket.on('disconnect', () => {
       console.log('Disconnected from WebSocket');
     });
@@ -58,25 +115,68 @@ export default function Home() {
       <InfoCard
         icon={EnergyIcon}
         title="ENERGY EFFICIENCY"
-        content={infoCardContent.energyEfficiency || "Loading..."}
+        overallRating={ratings.energyEfficiency.overall}
+        overallJustification={infoCardContent.energyEfficiency.overall}
+        subsections={{
+          "Lighting": {
+            rating: ratings.energyEfficiency.lighting,
+            justification: infoCardContent.energyEfficiency.lighting
+          },
+          "Appliances and Electronics": {
+            rating: ratings.energyEfficiency.appliancesAndElectronics,
+            justification: infoCardContent.energyEfficiency.appliancesAndElectronics
+          }
+        }}
       />
       <InfoCard
         icon={AirQualityIcon}
         title="INDOOR AIR QUALITY"
-        content={infoCardContent.indoorAirQuality || "Loading..."}
+        overallRating={ratings.indoorAirQuality.overall}
+        overallJustification={infoCardContent.indoorAirQuality.overall}
+        subsections={{
+          "Air Quality": {
+            rating: ratings.indoorAirQuality.airQuality,
+            justification: infoCardContent.indoorAirQuality.airQuality
+          },
+          "Materials": {
+            rating: ratings.indoorAirQuality.materials,
+            justification: infoCardContent.indoorAirQuality.materials
+          }
+        }}
       />
-
       <InfoCard
         icon={WasteIcon}
         title="RESOURCE AND WASTE MANAGEMENT"
-        content={infoCardContent.wasteManagement || "Loading..."}
+        overallRating={ratings.resourceEfficiency.overall}
+        overallJustification={infoCardContent.resourceEfficiency.overall}
+        subsections={{
+          "Material Sustainability": {
+            rating: ratings.resourceEfficiency.materialSustainability,
+            justification: infoCardContent.resourceEfficiency.materialSustainability
+          },
+          "Waste Management": {
+            rating: ratings.resourceEfficiency.wasteManagement,
+            justification: infoCardContent.resourceEfficiency.wasteManagement
+          }
+        }}
       />
 
-      <InfoCard
+      {/* <InfoCard
         icon={LocationIcon}
         title="LOCATION ANALYSIS"
-        content={infoCardContent.locationAnalysis || "Loading..."}
-      />
+        overallRating={ratings.energyEfficiency.overall}
+        overallJustification={infoCardContent.energyEfficiency.overall}
+        subsections={{
+          "Lighting": {
+            rating: ratings.energyEfficiency.lighting,
+            justification: infoCardContent.energyEfficiency.lighting
+          },
+          "Appliances and Electronics": {
+            rating: ratings.energyEfficiency.appliancesAndElectronics,
+            justification: infoCardContent.energyEfficiency.appliancesAndElectronics
+          }
+        }}
+      /> */}
       
     </div>
   );
