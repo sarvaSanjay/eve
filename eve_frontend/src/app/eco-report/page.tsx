@@ -8,7 +8,6 @@ import {
   Recycling as WasteIcon,
   LocationOn as LocationIcon,
 } from '@mui/icons-material';
-import io from 'socket.io-client';
 
 export default function EcoReportPage() {
   const router = useRouter();
@@ -68,7 +67,7 @@ export default function EcoReportPage() {
     // socket.on('send_eco_report', (data) => {
     if (data){
       const parsedData = JSON.parse(data as string);
-      setEcoChampion(parsedData.FinalRating.Rating); // Adjust according to your response structure
+      setEcoChampion(parsedData["Final Rating"]["Rating"]); // Adjust according to your response structure
       setRatings({
         energyEfficiency: {
           lighting: parsedData["Energy Efficiency"]["Lighting"]["Rating"],

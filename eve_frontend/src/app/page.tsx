@@ -1,6 +1,7 @@
+'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import io from 'socket.io-client';
 
 const StartCommandPage = () => {
@@ -23,11 +24,9 @@ const StartCommandPage = () => {
       socket.emit('send_command', { command: 'start_robot' });
 
       socket.once('send_echo_report', (data) => {
-        // Pass data to the report page and navigate
-        router.push({
-          pathname: '/eco-report',
-          query: { data: JSON.stringify(data) }
-        });
+        // Convert data to a JSON string and navigate
+        const queryString = `data=${encodeURIComponent(JSON.stringify(data))}`;
+        router.push(`/eco-report?${queryString}`);
       });
     }
   };
