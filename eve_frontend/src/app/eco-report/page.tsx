@@ -39,6 +39,7 @@ export default function EcoReportPage() {
     energyEfficiency: {
       lighting: '',
       appliancesAndElectronics: '',
+      percentages: [] as number[],
       overall: ''
     },
     indoorAirQuality: {
@@ -49,6 +50,8 @@ export default function EcoReportPage() {
     resourceEfficiency: {
       materialSustainability: '',
       wasteManagement: '',
+      percentages: [] as number[],
+      labels: [] as string[],
       overall: ''
     },
     finalRating: ''
@@ -66,6 +69,41 @@ export default function EcoReportPage() {
       const parsedData = JSON.parse(queryData as string);
       console.log(queryData)
       // setEcoChampion(parsedData["Final Rating"]["Rating"]); // Adjust according to your response structure
+      const getLightingPercentages = (text) => {
+        const naturalRegex = /Natural:\s*(\d+)%/;
+        const artificialRegex = /Artificial:\s*(\d+)%/;
+
+        const naturalMatch = text.match(naturalRegex);
+        const artificialMatch = text.match(artificialRegex);
+
+        const naturalPercentage = naturalMatch ? parseInt(naturalMatch[1], 10) : null;
+        const artificialPercentage = artificialMatch ? parseInt(artificialMatch[1], 10) : null;
+
+        return [
+          naturalPercentage,
+          artificialPercentage,
+        ];
+      };
+
+      const getMaterialPercentages = (text) => {
+        const breakdownRegex = /(\w+):\s*(\d+)%/g;
+        let match;
+        const labels = [];
+        const percentages = [];
+    
+        while ((match = breakdownRegex.exec(text)) !== null) {
+          labels.push(match[1]);
+          percentages.push(parseInt(match[2], 10));
+        }
+    
+        return { labels, percentages };
+      };
+
+      const lightingPercentagesRaw = parsedData["Energy Efficiency"]["Lighting"]["Percentage Breakdown"];
+      const lightingPercentages = getLightingPercentages(lightingPercentagesRaw);
+      const materialPercentageRaw = parsedData["Resource Efficiency and Waste Management"]["Material Sustainability"]["Percentage Breakdown"]
+      const { labels: materialLabels, percentages: materialPercentages } = getMaterialPercentages(materialPercentageRaw);
+      
       setRatings({
         energyEfficiency: { 
           lighting: parsedData["Energy Efficiency"]["Lighting"]["Rating"],
@@ -88,6 +126,7 @@ export default function EcoReportPage() {
         energyEfficiency: {
           lighting: parsedData["Energy Efficiency"]["Lighting"]["Justification"],
           appliancesAndElectronics: parsedData["Energy Efficiency"]["Appliances and Electronics"]["Justification"],
+          percentages: lightingPercentages as number[],
           overall: parsedData["Energy Efficiency"]["Overall"]["Justification"],
         },
         indoorAirQuality: {
@@ -98,6 +137,8 @@ export default function EcoReportPage() {
         resourceEfficiency: {
           materialSustainability: parsedData["Resource Efficiency and Waste Management"]["Material Sustainability"]["Justification"],
           wasteManagement: parsedData["Resource Efficiency and Waste Management"]["Waste Management"]["Justification"],
+          percentages: materialPercentages,
+          labels: materialLabels,
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Justification"],
         },
         finalRating: "",
@@ -119,8 +160,9 @@ export default function EcoReportPage() {
         sub_2= "Appliances and Electronics"
         sub_2_rating= {ratings.energyEfficiency.appliancesAndElectronics}
         sub_2_just={infoCardContent.energyEfficiency.appliancesAndElectronics}
-        bgcolor='#98BF64'
-        iconcolor='#fff'
+        // percentages={infoCardContent.energyEfficiency.percentages}
+        percentages={infoCardContent.energyEfficiency.percentages}
+        labels={['Artificial Light', 'Natural Light']}
       />
       <InfoCard
         icon={AirQualityIcon}
@@ -133,8 +175,8 @@ export default function EcoReportPage() {
         sub_2= "Materials"
         sub_2_rating= {ratings.indoorAirQuality.materials}
         sub_2_just={infoCardContent.indoorAirQuality.materials}
-        bgcolor='#fff'
-        iconcolor='#98BF64'
+        percentages={[30,40]}
+        labels={["Volatile Organic Compounds (VOCs)","Particulate Matter (PM2.5)"]}
       />
       <InfoCard
         icon={WasteIcon}
@@ -147,8 +189,8 @@ export default function EcoReportPage() {
         sub_2= "Waste Management"
         sub_2_rating= {ratings.resourceEfficiency.wasteManagement}
         sub_2_just={infoCardContent.resourceEfficiency.wasteManagement}
-        bgcolor='#98BF64'
-        iconcolor='#fff'
+        percentages={infoCardContent.resourceEfficiency.percentages}
+        labels={infoCardContent.resourceEfficiency.labels}
       />
 
       {/* <InfoCard
