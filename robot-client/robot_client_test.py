@@ -5,12 +5,24 @@ import asyncio
 import base64
 from os import path
 import socketio
+import socket
 
 # Define a unique robot ID
 robot_id = "robot123"
 
 # Create a Socket.IO client instance
 sio = socketio.AsyncClient()
+
+
+# Set up the server to accept connections from the EV3 client
+serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+serversocket.bind(('0.0.0.0', 12345)) 
+serversocket.listen(1)
+
+print("Waiting for EV3 client connection...")
+(clientsocket, address) = serversocket.accept()
+print("Connected to EV3 client at", address)
 
 # Define event handlers for the client
 
@@ -71,28 +83,31 @@ async def capture_images():
         print('Device name:', device.getDeviceName(), ' Product name:', device.getProductName())
         q_rgb = device.getOutputQueue("rgb")
 
-        capture_interval = 5  # seconds
-        last_capture_time = time.time()
+        img_num+=1
+        in_rgb = q_rgb.get()
+        print("in_rgb")
+        print(in_rgb)
+        if in_rgb is not None:
+            frame = in_rgb.getCvFrame()
+            encoded_image = get_image_data(frame)
+            await sio.emit('robot_send_image', {'index': img_num,'image_data': encoded_image})
 
-        print(stop_img_capture)
-        while not stop_img_capture and img_num<4:
-            img_num+=1
-            in_rgb = q_rgb.get()
-            print("in_rgb")
-            print(in_rgb)
-            if in_rgb is not None:
-                frame = in_rgb.getCvFrame()
-                print("frame")
-                print(frame)
-                # current_time = time.time()
-                # if current_time - last_capture_time >= capture_interval:
-                # last_capture_time = current_time
-                encoded_image = get_image_data(frame)
-                print(encoded_image)
-                await sio.emit('robot_send_image', {'index': img_num,'image_data': encoded_image})
 
-            if cv2.waitKey(1) == ord('q'):
-                break
+async def handle_ev3_client(clientsocket):
+    while True:
+        try:
+            data = clientsocket.recv(1024)
+            if not data:
+                continue
+            message = data.decode()
+            print("Received from EV3 client:", message)
+            if message == 'Take a picture':
+                # Trigger image capture directly
+                await capture_images()
+                # Send acknowledgment back to EV3 client
+                clientsocket.sendall("Picture taken".encode())
+        except Exception as e:
+            print("Error handling EV3 client:", e)
 
 def get_image_data(frame):
     _, buffer = cv2.imencode('.jpeg', frame)
@@ -104,7 +119,10 @@ def get_image_data(frame):
 
 async def main():
     # Connect the client to the server
-    await sio.connect('http://localhost:5000')
+    await sio.connect('http://100.66.219.234:5000')
+
+    asyncio.create_task(handle_ev3_client(clientsocket))
+
 
     # Wait for events indefinitely
     await sio.wait()
