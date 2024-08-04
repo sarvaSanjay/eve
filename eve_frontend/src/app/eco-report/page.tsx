@@ -33,6 +33,10 @@ export default function EcoReportPage() {
       wasteManagement: '',
       overall: ''
     },
+    location: {
+      transport: '',
+      green: '',
+    },
     finalRating: ''
   });
   const [infoCardContent, setInfoCardContent] = useState({
@@ -54,21 +58,17 @@ export default function EcoReportPage() {
       labels: [] as string[],
       overall: ''
     },
-    finalRating: ''
+    location: {
+      transport: '',
+      green: '',
+    }
   });
 
   useEffect(() => {
-    // const socket = io('http://100.66.219.234:5000/'); // Replace with your server URL
-  
-    // socket.on('connect', () => {
-    //   console.log('Connected to WebSocket');
-    // });
-  
-    // socket.on('send_eco_report', (data) => {
     if (queryData){
       const parsedData = JSON.parse(queryData as string);
       console.log(queryData)
-      // setEcoChampion(parsedData["Final Rating"]["Rating"]); // Adjust according to your response structure
+      setEcoChampion("Green Advocate"); // Adjust according to your response structure
       const getLightingPercentages = (text) => {
         const naturalRegex = /Natural:\s*(\d+)%/;
         const artificialRegex = /Artificial:\s*(\d+)%/;
@@ -120,7 +120,11 @@ export default function EcoReportPage() {
           wasteManagement: parsedData["Resource Efficiency and Waste Management"]["Waste Management"]["Rating"],
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Rating"],
         },
-        finalRating: "",
+        location: {
+          transport: parsedData["Proximity to Public Transport"]["Rating"],
+          green: parsedData["Proximity to Green Spaces"]["Ratings"],
+        },
+        finalRating: "Green Advocate",
       });
       setInfoCardContent({
         energyEfficiency: {
@@ -141,10 +145,17 @@ export default function EcoReportPage() {
           labels: materialLabels,
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Justification"],
         },
-        finalRating: "",
+        location: {
+          transport: parsedData["Proximity to Public Transport"]["Justification"],
+          green: parsedData["Proximity to Green Spaces"]["Justification"],
+        },
       });
     }
 }, [queryData]);
+
+const handleAskQuestion = () => {
+  router.push('/question-page');
+};
 
   return (
     <div>
@@ -193,20 +204,26 @@ export default function EcoReportPage() {
         labels={infoCardContent.resourceEfficiency.labels}
       />
 
-      {/* <InfoCard
+      <InfoCard
         icon={LocationIcon}
         title="LOCATION ANALYSIS"
         overallRating={ratings.energyEfficiency.overall}
         overallJustification={infoCardContent.energyEfficiency.overall}
-        sub_1= "Material Sustainability"
-        sub_1_rating= {ratings.resourceEfficiency.materialSustainability}
-        sub_1_just={infoCardContent.resourceEfficiency.materialSustainability}
-        sub_2= "Waste Management"
-        sub_2_rating= {ratings.resourceEfficiency.wasteManagement}
-        sub_2_just={infoCardContent.resourceEfficiency.wasteManagement}
-        bgcolor='#fff'
-        iconcolor='#98BF64'
-      /> */}
+        sub_1= "Proximity to Public Transport"
+        sub_1_rating= {ratings.location.transport}
+        sub_1_just={infoCardContent.location.transport}
+        sub_2= "Proximity to Green Spaces"
+        sub_2_rating= {ratings.location.green}
+        sub_2_just={infoCardContent.location.green}
+        percentages={[30,40]}
+        labels={["Number of Parks","Number of bus stops"]}
+      />
+       {/* <button
+        onClick={handleAskQuestion}
+        className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 mt-4"
+      >
+        Ask a Question
+      </button> */}
       
     </div>
   );
