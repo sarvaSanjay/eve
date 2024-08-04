@@ -38,7 +38,7 @@ def find_closest_place(places, lat, lon):
     return min(places, key=lambda place: (place['lat'] - lat)**2 + (place['lon'] - lon)**2)
 
 def main():
-    coordinates = (43.66113142212748, -79.40085380456783)
+    coordinates = (43.660250746098406, -79.39731944061882)
 
     if coordinates:
         lat, lon = coordinates

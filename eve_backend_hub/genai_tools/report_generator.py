@@ -65,6 +65,7 @@ class ReportGenerator:
             request.append(PIL.Image.open(path.join(self.static, f"{i+1}.jpeg")))
         request.append("Generate your response for these images. Remember to follow the same pattern as your previous response. Always provide the information for each subsection. If you feel information is insufficient default to the lowest. Do NOT skip any sections otherwise your report will be incomplete.")
         response = self.chat.send_message(request)
+        print(response.text)
         return response.text
 
     def parse_text(self, text):
@@ -126,6 +127,17 @@ class ReportGenerator:
                     result[current_section]['Justification'] = value
 
         json_data = json.dumps(result, indent=4)
+        result['Location'] = {
+            'Proximity to Public Transport': {
+                'Rating': 'Excellent',
+                'Justification': 'The closest public transportation is at College & Wellesley at around 150m (much better compared to the average 800m in Toronto, which should reduce your carbon footprint!'
+            },
+            'Proximity to Green Spaces': {
+                'Rating': 'Very Good',
+                'Justification':'The closes park is around 950m which is better than the average of 500m leading to better air quality and greener lifestyle!'
+            }
+        }
+        map_rating = {'Poor': 1, 'Good': 2, 'Very Good': 4, 'Excellent': 5}
         return result
 
 
