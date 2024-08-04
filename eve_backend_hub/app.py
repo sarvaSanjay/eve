@@ -68,7 +68,6 @@ def handle_send_command(data):
     rg.one_shot_prompt()
 
 
-
 @socketio.on('robot_send_image')
 def handle_send_image(data):
     robot_sid = request.sid
@@ -80,6 +79,18 @@ def handle_send_image(data):
         f.write(base64.b64decode(data.get('image_data')))
     print(f'sending image to browser sid: {browser_sid}')
     emit('send_browser_image', data, to=browser_sid)
+
+
+@socketio.on('robot_stopped')
+def handle_robot_stopped(data):
+    robot_sid = request.sid
+    browser_sid = robots_to_browsers[robot_sid]
+    import time
+    start_time = time.time()
+    data = rg.get_eco_report()
+    print("--- %s seconds ---" % (time.time() - start_time))
+    emit('send_eco_report', data, to=browser_sid)
+    print(data)
 
 
 # Event handler for when a robot disconnects
