@@ -1,5 +1,5 @@
 # Use the NVIDIA L4T base image
-FROM nvcr.io/nvidia/l4t-base:r32.5.0
+FROM nvcr.io/nvidia/l4t-base:r36.2.0
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
