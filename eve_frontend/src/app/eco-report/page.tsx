@@ -123,9 +123,9 @@ export default function EcoReportPage() {
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Rating"],
         },
         location: {
-          transport: parsedData["Proximity to Public Transport"]["Rating"],
-          green: parsedData["Proximity to Green Spaces"]["Rating"],
-          overall: parsedData["Overall"]["Rating"],
+          transport: parsedData["Location"]["Proximity to Public Transport"]["Rating"],
+          green: parsedData["Location"]["Proximity to Green Spaces"]["Rating"],
+          overall: parsedData["Location"]["Overall"]["Rating"],
         },
         finalRating: "Green Advocate",
       });
@@ -149,9 +149,9 @@ export default function EcoReportPage() {
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Justification"],
         },
         location: {
-          transport: parsedData["Proximity to Public Transport"]["Justification"],
-          green: parsedData["Proximity to Green Spaces"]["Justification"],
-          overall: parsedData["Proximity to Green Spaces"]["Justification"],
+          transport: parsedData["Location"]["Proximity to Public Transport"]["Justification"],
+          green: parsedData["Location"]["Proximity to Green Spaces"]["Justification"],
+          overall: parsedData["Location"]["Proximity to Green Spaces"]["Justification"],
         },
       });
     }
