@@ -1,17 +1,16 @@
 import cv2
-import depthai
+import depthai as dai
 import asyncio
 import base64
 import socketio
 import socket
 from concurrent.futures import ThreadPoolExecutor
 
-
 # Define a unique robot ID
 robot_id = "robot123"
 
 recv_buffer = b""
-end_char =  b"\0"
+end_char = b"\0"
 
 # Create a Socket.IO client instance
 sio = socketio.AsyncClient()
@@ -27,6 +26,7 @@ print("Waiting for EV3 client connection...")
 print("Connected to EV3 client at", address)
 
 executor = ThreadPoolExecutor(max_workers=1)
+capture_event = asyncio.Event()
 
 # Define event handlers for the client
 @sio.event
@@ -50,7 +50,6 @@ img_num = 0
 
 @sio.on('execute_command')
 async def on_execute_command(data):
-    global img_num
     command = data.get('command')
     print(f"Executing command: {command}")
     if command == 'start_robot':
@@ -59,13 +58,14 @@ async def on_execute_command(data):
     result = f"Command '{command}' executed"
     print(result)
 
-async def capture_images():
-    global img_num
-    pipeline = depthai.Pipeline()
+async def video_stream():
+    pipeline = dai.Pipeline()
     cam_rgb = pipeline.createColorCamera()
     cam_rgb.setPreviewSize(1920, 1080)
     cam_rgb.setInterleaved(False)
-    
+    cam_rgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.RGB)
+    cam_rgb.initialControl.setAutoFocusMode(dai.CameraControl.AutoFocusMode.AUTO)
+
     cam_rgb.initialControl.setSharpness(0)     # range: 0..4, default: 1
     cam_rgb.initialControl.setLumaDenoise(0)   # range: 0..4, default: 1
     cam_rgb.initialControl.setChromaDenoise(4) # range: 0..4, default: 1
@@ -74,16 +74,27 @@ async def capture_images():
 
     cam_rgb.preview.link(xout_rgb.input)
 
-    with depthai.Device(pipeline) as device:
+    with dai.Device(pipeline) as device:
         print('Connected cameras:', device.getConnectedCameraFeatures())
         print('Device name:', device.getDeviceName(), ' Product name:', device.getProductName())
-        q_rgb = device.getOutputQueue("rgb")
-        img_num += 1
-        in_rgb = q_rgb.get()
-        if in_rgb is not None:
-            frame = in_rgb.getCvFrame()
-            encoded_image = get_image_data(frame)
-            await sio.emit('robot_send_image', {'index': img_num, 'image_data': encoded_image})
+        q_rgb = device.getOutputQueue("rgb", maxSize=1, blocking=False)
+
+        while True:
+            # Non-blocking attempt to get a frame
+            in_rgb = q_rgb.tryGet()
+            if in_rgb is not None:
+                frame = in_rgb.getCvFrame()
+                if capture_event.is_set():
+                    capture_event.clear()
+                    await capture_image(frame)
+
+            await asyncio.sleep(0.01)  # Yield control to event loop
+
+async def capture_image(frame):
+    global img_num
+    img_num += 1
+    encoded_image = get_image_data(frame)
+    await sio.emit('robot_send_image', {'index': img_num, 'image_data': encoded_image})
 
 async def handle_ev3_client(clientsocket):
     print('Started handle_ev3_client function')
@@ -95,7 +106,7 @@ async def handle_ev3_client(clientsocket):
                 continue
             print("Received from EV3 client:", message)
             if message == 'Take a picture':
-                await capture_images()
+                capture_event.set()
                 write_to_client(clientsocket, "Picture taken")
             elif message == 'Robot Stopped':
                 await sio.emit('robot_stopped', 'Robot Stopped')
@@ -145,13 +156,14 @@ async def main():
         await sio.connect('http://100.66.219.234:5000')
         print("Socket.IO client connected")
 
-        # Create tasks for handling the Socket.IO client and the EV3 client
+        # Create tasks for handling the Socket.IO client, EV3 client, and video stream
         tasks = [
             asyncio.create_task(sio.wait()),  # Handle Socket.IO events
-            asyncio.create_task(handle_ev3_client(clientsocket))  # Handle EV3 client
+            asyncio.create_task(handle_ev3_client(clientsocket)),  # Handle EV3 client
+            asyncio.create_task(video_stream())  # Run video stream
         ]
-
-        # Wait for both tasks to complete
+        
+        # Wait for all tasks to complete
         await asyncio.gather(*tasks)
     except Exception as e:
         print(f"Error in main: {e}")
