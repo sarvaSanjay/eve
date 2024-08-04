@@ -222,13 +222,12 @@ const handleAskQuestion = () => {
         percentages={[30,40]}
         labels={["Number of Parks","Number of bus stops"]}
       />
-       {/* <button
+       <button
         onClick={handleAskQuestion}
-        className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 mt-4"
+        className="bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 mt-4 mx-auto"
       >
         Ask a Question
-      </button> */}
-      
+      </button>
     </div>
   );
 }
