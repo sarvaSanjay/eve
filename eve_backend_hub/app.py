@@ -29,11 +29,13 @@ def handle_browser_connection(data):
     # Check if the requested robot is connected
     if robot_id in connected_robots:
         room = f"robot_{robot_id}"
+        prev_browser_id = robots_to_browsers.get(connected_robots[robot_id])
         browsers_to_robots[browser_sid] = connected_robots[robot_id]
         robots_to_browsers[connected_robots[robot_id]] = browser_sid
         print(browsers_to_robots)
         join_room(room)
-        emit('browser_connected', {'message': f'Browser with sid {browser_sid} Connected to robot {robot_id}'}, room=room)
+        if not prev_browser_id:
+            emit('browser_connected', {'message': f'Browser with sid {browser_sid} Connected to robot {robot_id}'}, room=room)
     else:
         emit('error', {'message': 'Robot not connected'})
 
