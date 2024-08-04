@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import InfoCard from '@/components/Energy';
 import EcoReport from '../components/HelloWorld';
 import {
@@ -6,39 +7,75 @@ import {
   Recycling as WasteIcon,
   LocationOn as LocationIcon,
 } from '@mui/icons-material';
+import io from 'socket.io-client';
 
 export default function Home() {
+  const [ecoChampion, setEcoChampion] = useState('');
+  const [ratings, setRatings] = useState({
+    energyEfficiency: '',
+    indoorAirQuality: '',
+    wasteManagement: '',
+    locationAnalysis: ''
+  });
+  const [infoCardContent, setInfoCardContent] = useState({
+    energyEfficiency: '',
+    indoorAirQuality: '',
+    wasteManagement: '',
+    locationAnalysis: '',
+    userRating: ''
+  });
+  const [averageRatings, setAverageRatings] = useState({
+    avgEnergyEfficiency: '',
+    avgIndoorAirQuality: '',
+    avgWasteManagement: '',
+    avgLocationAnalysis: ''
+  });
+
+  useEffect(() => {
+    const socket = io('http://100.66.219.234:5000/'); // Replace with your server URL
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket');
+    });
+
+    socket.on('eco-report', (data) => {
+      setEcoChampion(data.ecoChampion);
+      setRatings(data.ratings);
+      setInfoCardContent(data.infoCards);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
   return (
     <div>
-      <EcoReport />
+      <EcoReport ecoChampion={ecoChampion} ratings={ratings}/>
       <InfoCard
         icon={EnergyIcon}
         title="ENERGY EFFICIENCY"
-        content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
-              Curabitur pretium tincidunt lacus. Nulla gravida orci a odio."
+        content={infoCardContent.energyEfficiency || "Loading..."}
       />
       <InfoCard
         icon={AirQualityIcon}
         title="INDOOR AIR QUALITY"
-        content="Another content for Indoor Air Quality. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        content={infoCardContent.indoorAirQuality || "Loading..."}
       />
 
-<InfoCard
+      <InfoCard
         icon={WasteIcon}
         title="RESOURCE AND WASTE MANAGEMENT"
-        content="Another content for Indoor Air Quality. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        content={infoCardContent.wasteManagement || "Loading..."}
       />
 
-<InfoCard
+      <InfoCard
         icon={LocationIcon}
         title="LOCATION ANALYSIS"
-        content="Another content for Indoor Air Quality. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        content={infoCardContent.locationAnalysis || "Loading..."}
       />
       
     </div>

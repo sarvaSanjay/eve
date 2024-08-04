@@ -29,6 +29,7 @@ def handle_browser_connection(data):
         room = f"robot_{robot_id}"
         browsers_to_robots[browser_sid] = connected_robots[robot_id]
         robots_to_browsers[connected_robots[robot_id]] = browser_sid
+        print(browsers_to_robots)
         join_room(room)
         emit('browser_connected', {'message': f'Browser with sid {browser_sid} Connected to robot {robot_id}'}, room=room)
     else:
@@ -55,6 +56,7 @@ def handle_robot_connection(data):
 def handle_send_command(data):
     command = data.get('command')
     browser_sid = request.sid
+    print(browsers_to_robots)
     robot_sid = browsers_to_robots[browser_sid]
     print(f"Command received from Browser SID {browser_sid} for Robot ID {robot_sid}: {command}")
 
@@ -66,12 +68,13 @@ def handle_send_command(data):
 @socketio.on('robot_send_image')
 def handle_send_image(data):
     robot_sid = request.sid
+    print(f"received image from robot {robot_sid}")
     browser_sid = robots_to_browsers[robot_sid]
     file_name = f'static/{data.get("index")}.jpeg'
     file_name = path.join(path.dirname(path.realpath(__file__)), file_name)
     with open(file_name, 'wb+') as f:
         f.write(base64.b64decode(data.get('image_data')))
-    print(f'sending to browser sid: {browser_sid}')
+    print(f'sending image to browser sid: {browser_sid}')
     emit('send_browser_image', data, to=browser_sid)
 
 

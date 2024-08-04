@@ -1,5 +1,5 @@
 # Use the NVIDIA L4T base image
-FROM nvcr.io/nvidia/ai-workbench/python-cuda117:1.0.3
+FROM nvcr.io/nvidia/l4t-base:r36.2.0
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive

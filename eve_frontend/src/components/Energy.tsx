@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box, Typography, Grid, Paper } from '@mui/material';
+import GradientBarChart from '@/components/graph';
 
-const InfoCard = ({ icon: Icon, title, content}) => {
+const InfoCard = ({ icon: Icon, title, content, userRating, averageRating}) => {
   return (
     <Paper elevation={3} sx={{ padding: '20px', backgroundColor: '#98BF64' }}>
       <Grid container spacing={3}>
@@ -16,6 +17,7 @@ const InfoCard = ({ icon: Icon, title, content}) => {
             <Typography variant="body1" className='font-economica'>
               {content}
             </Typography>
+            <GradientBarChart averageRating={averageRating} userRating={userRating} />
           </Box>
         </Grid>
       </Grid>
