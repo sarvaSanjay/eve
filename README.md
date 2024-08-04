@@ -27,7 +27,7 @@ We successfully created a fully autonomous robot capable of navigating complex i
 Throughout this project, we gained valuable insights into the intricacies of hardware-software integration, particularly in the realms of concurrency and real-time data processing. We enhanced our understanding of socket programming, which was crucial for efficient data transmission. Our experience with localization and mapping provided a deeper appreciation for the complexities of autonomous navigation in dynamic environments.
 
 ## What's next for Eve 🌍
-The future for EVE is bright. We plan to enhance its capabilities by incorporating additional sensors for more comprehensive environmental assessments. Improving the AI algorithms for faster and more accurate data analysis is another priority. We also envision expanding EVE's application scope beyond buildings to include outdoor environments and larger infrastructure projects and actually integrate speech and audio to enable actually talking to the robot. Ultimately, we aim to make EVE an indispensable tool in the quest for sustainable and healthy living spaces.
+The future for EVE is bright. We plan to enhance its capabilities by incorporating additional sensors for more comprehensive environmental assessments. Improving the AI algorithms for faster and more accurate data analysis is another priority. We also envision expanding EVE's application scope beyond buildings to include outdoor environments and larger infrastructure projects and integrate speech and audio to enable actually talking to the robot. Ultimately, we aim to make EVE an indispensable tool in the quest for sustainable and healthy living spaces.
 
 # Built With
 - LEGO Mindstorms EV3 🤖
