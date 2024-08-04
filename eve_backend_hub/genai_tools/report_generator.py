@@ -63,7 +63,7 @@ class ReportGenerator:
         request = []
         for i in range(4):
             request.append(PIL.Image.open(path.join(self.static, f"{i+1}.jpeg")))
-        request.append("Generate your response for these images. Remember to follow the same pattern as your previous response")
+        request.append("Generate your response for these images. Remember to follow the same pattern as your previous response. Always provide the information for each subsection. If you feel information is insufficient default to the lowest. Do NOT skip any sections otherwise your report will be incomplete.")
         response = self.chat.send_message(request)
         return response.text
 
@@ -126,7 +126,7 @@ class ReportGenerator:
                     result[current_section]['Justification'] = value
 
         json_data = json.dumps(result, indent=4)
-        return json_data
+        return result
 
 
     def get_eco_report(self):
