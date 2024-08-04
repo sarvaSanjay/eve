@@ -228,8 +228,8 @@ const handleAskQuestion = () => {
         sub_2= "Proximity to Green Spaces"
         sub_2_rating= {ratings.location.green}
         sub_2_just={infoCardContent.location.green}
-        percentages={[30,40]}
-        labels={["Number of Parks","Number of bus stops"]}
+        percentages={[30,40,30]}
+        labels={["Number of Parks","Number of bus stops","Number of bikeshares"]}
       />
        <button
         onClick={handleAskQuestion}
