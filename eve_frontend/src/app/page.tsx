@@ -11,7 +11,7 @@ const StartCommandPage = () => {
 
   useEffect(() => {
     // Create and set up the socket connection
-    const newSocket = io('http://100.66.219.234:5000/');
+    const newSocket = io('http://localhost:5000/');
     setSocket(newSocket);
 
     // Clean up the socket connection on component unmount
@@ -46,33 +46,41 @@ const StartCommandPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-50">
-  <div className="text-center bg-white p-8 rounded-lg shadow-lg border border-green-200">
-    <h1 className="text-2xl font-bold mb-6 text-green-800">Control Robot</h1>
-    
-    {/* Connect Button */}
-    <button
-      onClick={handleConnectRobot}
-      className={`bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 mb-6 mr-10${
-        isConnected ? 'opacity-50 cursor-not-allowed' : ''
-      }`}
-      disabled={isConnected}
-    >
-      {isConnected ? 'Connected' : 'Connect Robot'}
-    </button>
-
-    {/* Start Robot Button */}
-    <button
-      onClick={handleStartRobot}
-      className={`bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 ${
-        !isConnected ? 'opacity-50 cursor-not-allowed' : ''
-      }`}
-      disabled={!isConnected}
-    >
-      Start Robot
-    </button>
+    <div className="min-h-screen gradient-bg flex flex-col items-center">
+    <h1 className="text-8xl font-playfair text-green-700 mt-12">
+      Eve
+    </h1>
+  
+    <div className="flex flex-grow items-center justify-center w-full mb-12">
+      <div className="text-center bg-white p-8 rounded-lg shadow-lg border border-green-200">
+        <h1 className="text-2xl font-bold mb-6 text-green-800">Controls</h1>
+  
+        {/* Connect Button */}
+        <button
+          onClick={handleConnectRobot}
+          className={`bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 mb-6 mr-10 ${
+            isConnected ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={isConnected}
+        >
+          {isConnected ? 'Connected' : 'Connect Robot'}
+        </button>
+  
+        {/* Start Robot Button */}
+        <button
+          onClick={handleStartRobot}
+          className={`bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 ${
+            !isConnected ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={!isConnected}
+        >
+          Start Robot
+        </button>
+      </div>
+    </div>
   </div>
-</div>
+  
+  
 
   );
 };

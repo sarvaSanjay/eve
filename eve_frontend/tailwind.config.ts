@@ -15,6 +15,7 @@ const config: Config = {
       },
       fontFamily: {
         economica: ['Economica', 'sans-serif'],
+        russo: ['Russo One', 'sans-serif'],
       },
     },
   },

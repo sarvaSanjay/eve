@@ -27,7 +27,7 @@ const EcoReport = ({ ecoChampion, ratings}) => {
             Your Environmental Sustainability and Efficiency Report
           </Typography>
           <Typography variant="h4" component="p" color="textSecondary" className='font-economica'>
-            You're an
+            You're a
           </Typography>
           <div style={{ paddingLeft: '15rem', paddingBottom: '10px', paddingTop: '10px' }}>
           <RadarChartComponent />

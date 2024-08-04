@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Economica:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,4 +32,22 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(270deg, #5fff94, #ddfe7b, #f0f0f0);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
 }
