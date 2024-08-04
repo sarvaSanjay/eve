@@ -1,11 +1,13 @@
 import base64
 from os import path
-
+#from genai_tools import Report_Generator
+import genai_tools.report_generator as report_generator
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
+rg = report_generator.ReportGenerator()
 
 # Dictionary to track robot connections
 connected_robots = {}
@@ -63,6 +65,8 @@ def handle_send_command(data):
     # Send different messages to the browser and robot
     emit('execute_command', {'command': command}, to=robot_sid)
     emit('acknowledge_command', {'message': f'Command "{command}" sent to robot'}, to=browser_sid)
+    rg.one_shot_prompt()
+
 
 
 @socketio.on('robot_send_image')

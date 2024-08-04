@@ -17,39 +17,40 @@ const data = {
     },
   ],
 };
-
-const InfoCard = ({ 
-  icon: Icon, 
-  title, 
-  content, 
-  userRating, 
-  averageRating, 
-  bgcolor = '#98BF64', 
-  iconcolor = '#fff' 
-}) => {
+const InfoCard = ({ icon: Icon, title, overallRating, overallJustification, subsections, bgcolor = '#98BF64', 
+  iconcolor = '#fff' }) => {
   return (
     <Paper elevation={3} sx={{ padding: '20px', backgroundColor: bgcolor }}>
-       <Grid container spacing={3} alignItems="center">
-      <Grid item xs={4} display="flex" justifyContent="center" alignItems="center">
-        <Icon sx={{ fontSize: 300, color: iconcolor }} />
-      </Grid>
-      <Grid item xs={4}>
+      <Grid container spacing={3}>
+        <Grid item xs={4} display="flex" justifyContent="center" alignItems="center">
+          <Icon sx={{ fontSize: 150, color: iconcolor }} />
+        </Grid>
+        <Grid item xs={8}>
         <Box>
-          <Typography variant="h4" component="h2" className='font-economica' gutterBottom>
+          <Typography variant="h5" component="h2" className='font-economica' gutterBottom>
             {title}
           </Typography>
+          {Object.keys(subsections).map(subsection => (
+            <div key={subsection}>
+              <Typography variant="body1" className='font-economica'>
+                <strong>{subsection} Rating:</strong> {subsections[subsection].rating}
+              </Typography>
+              <Typography variant="body1" className='font-economica'>
+                <strong>{subsection} Justification:</strong> {subsections[subsection].justification}
+              </Typography>
+            </div>
+          ))}
           <Typography variant="body1" className='font-economica'>
-            {content}
+            <strong>Overall Rating:</strong> {overallRating}
           </Typography>
-          {/* <GradientBarChart averageRating={averageRating} userRating={userRating} /> */}
+          <Typography variant="body1" className='font-economica'>
+            <strong>Overall Justification:</strong> {overallJustification}
+          </Typography>
         </Box>
       </Grid>
-      <Grid item xs={4} display="flex" justifyContent="center" alignItems="center" marginTop={'5rem'}>
-        <PieChart data={data} />
-      </Grid>
     </Grid>
-    </Paper>
-  );
+  </Paper>
+);
 };
 
 export default InfoCard;
