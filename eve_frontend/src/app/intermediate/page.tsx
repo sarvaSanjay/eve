@@ -11,7 +11,7 @@ const IntermediatePage = () => {
 
   useEffect(() => {
     // Create and set up the socket connection
-    const newSocket = io('http://100.66.219.234:5000/');
+    const newSocket = io('http://localhost:5000.234:5000/');
     setSocket(newSocket);
 
     // Emit 'connect_browser' event

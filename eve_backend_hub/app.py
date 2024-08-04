@@ -1,9 +1,9 @@
 import base64
 from os import path
-#from genai_tools import Report_Generator
-import genai_tools.report_generator as report_generator
+
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
+import genai_tools.report_generator as report_generator
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
