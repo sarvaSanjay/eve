@@ -13,7 +13,7 @@ const QuestionPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const newSocket = io('http://100.66.219.234:5000/');
+    const newSocket = io('http://localhost:5000.234:5000/');
     setSocket(newSocket);
 
     return () => {

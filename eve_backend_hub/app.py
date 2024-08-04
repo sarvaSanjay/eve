@@ -1,9 +1,12 @@
 import base64
 from os import path
-#from genai_tools import Report_Generator
-import genai_tools.report_generator as report_generator
+
 from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from google.cloud import speech
+
+# from genai_tools import Report_Generator
+import genai_tools.report_generator as report_generator
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -108,6 +111,27 @@ def handle_robot_disconnection(data):
     room = f"robot_{robot_id}"
     leave_room(room)
     emit('robot_disconnected', {'message': f'Robot {robot_id} disconnected'}, room=room)
+
+
+@socketio.on('audio_stream')
+def handle_audio_stream(data):
+    print("Received audio data")
+
+    # Convert the audio data to bytes
+    audio_content = data.getbuffer().tobytes()
+
+    # Configure the request
+    audio = speech.RecognitionAudio(content=audio_content)
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000,  # Ensure this matches your audio sample rate
+        language_code="en-US",
+    )
+
+    # Send the request to Google Speech-to-Text
+    response = speech_client.recognize(config=config, audio=audio)
+    for res in response:
+        if res.is_final:
 
 
 if __name__ == '__main__':

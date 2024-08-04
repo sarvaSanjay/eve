@@ -161,7 +161,7 @@ def read_from_client(client_socket):
 async def main():
     try:
         # Connect the client to the server
-        await sio.connect('http://100.66.219.234:5000')
+        await sio.connect('http://localhost:5000.234:5000')
         print("Socket.IO client connected")
 
         # Create tasks for handling the Socket.IO client, EV3 client, and video stream
