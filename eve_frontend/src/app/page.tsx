@@ -32,10 +32,17 @@ const StartCommandPage = () => {
   };
 
   return (
-    <div>
-      <h1>Start Robot</h1>
-      <button onClick={handleStartRobot}>Start Robot</button>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="text-center bg-white p-8 rounded-lg shadow-lg">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Start Robot</h1>
+      <button
+        onClick={handleStartRobot}
+        className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
+      >
+        Start Robot
+      </button>
     </div>
+  </div>
   );
 };
 
