@@ -28,6 +28,9 @@ print("Connected to EV3 client at", address)
 executor = ThreadPoolExecutor(max_workers=1)
 capture_event = asyncio.Event()
 
+# Global flag to control stopping
+stop_flag = asyncio.Event()
+
 # Define event handlers for the client
 @sio.event
 async def connect():
@@ -44,6 +47,7 @@ async def robot_registered(data):
 
 @sio.on("browser_connected")
 async def browser_connected(data):
+    write_to_client(clientsocket, "browser connected")
     print(f"message: {data.get('message')}")
 
 img_num = 0
@@ -54,6 +58,10 @@ async def on_execute_command(data):
     print(f"Executing command: {command}")
     if command == 'start_robot':
         write_to_client(clientsocket, "start_robot")
+    elif command == 'stop_robot':
+        stop_flag.set()
+        write_to_client(clientsocket, "stop_robot")
+        await sio.emit('robot_stopped', 'Robot Stopped')
 
     result = f"Command '{command}' executed"
     print(result)
@@ -79,7 +87,7 @@ async def video_stream():
         print('Device name:', device.getDeviceName(), ' Product name:', device.getProductName())
         q_rgb = device.getOutputQueue("rgb", maxSize=1, blocking=False)
 
-        while True:
+        while not stop_flag.is_set():
             # Non-blocking attempt to get a frame
             in_rgb = q_rgb.tryGet()
             if in_rgb is not None:
@@ -98,10 +106,9 @@ async def capture_image(frame):
 
 async def handle_ev3_client(clientsocket):
     print('Started handle_ev3_client function')
-    while True:
+    while not stop_flag.is_set():
         try:
-            loop = asyncio.get_event_loop()
-            message = await loop.run_in_executor(executor, read_from_client, clientsocket)
+            message = await asyncio.get_event_loop().run_in_executor(executor, read_from_client, clientsocket)
             if not message:
                 continue
             print("Received from EV3 client:", message)
@@ -109,6 +116,7 @@ async def handle_ev3_client(clientsocket):
                 capture_event.set()
                 write_to_client(clientsocket, "Picture taken")
             elif message == 'Robot Stopped':
+                stop_flag.set()
                 await sio.emit('robot_stopped', 'Robot Stopped')
         except Exception as e:
             print("Error handling EV3 client:", e)
@@ -157,15 +165,25 @@ async def main():
         print("Socket.IO client connected")
 
         # Create tasks for handling the Socket.IO client, EV3 client, and video stream
-        tasks = [
-            asyncio.create_task(sio.wait()),  # Handle Socket.IO events
-            asyncio.create_task(handle_ev3_client(clientsocket)),  # Handle EV3 client
-            asyncio.create_task(video_stream())  # Run video stream
-        ]
+        task_sio_wait = asyncio.create_task(sio.wait())  # Handle Socket.IO events
+        task_ev3_client = asyncio.create_task(handle_ev3_client(clientsocket))  # Handle EV3 client
+        task_video_stream = asyncio.create_task(video_stream())  # Run video stream
         
-        # Wait for all tasks to complete
-        await asyncio.gather(*tasks)
+        # Wait for the stop_flag to be set
+        await stop_flag.wait()
+        
+        # Cancel all tasks
+        task_sio_wait.cancel()
+        task_ev3_client.cancel()
+        task_video_stream.cancel()
+        
+        # Wait for tasks to be cancelled
+        await asyncio.gather(task_sio_wait, task_ev3_client, task_video_stream, return_exceptions=True)
+        
     except Exception as e:
         print(f"Error in main: {e}")
 
-asyncio.run(main())
+# Run the asyncio event loop
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
