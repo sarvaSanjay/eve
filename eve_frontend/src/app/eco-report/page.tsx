@@ -45,6 +45,7 @@ export default function EcoReportPage() {
       lighting: '',
       appliancesAndElectronics: '',
       percentages: [] as number[],
+      labels: [] as string[],
       overall: ''
     },
     indoorAirQuality: {
@@ -72,19 +73,19 @@ export default function EcoReportPage() {
       console.log(queryData)
       setEcoChampion("Green Advocate"); // Adjust according to your response structure
       const getLightingPercentages = (text) => {
-        const naturalRegex = /Natural:\s*(\d+)%/;
-        const artificialRegex = /Artificial:\s*(\d+)%/;
+        const breakdownRegex = /(\w+):\s*(\d+)%/g;
+  
+  let match;
+  const labels = [];
+  const percentages = [];
 
-        const naturalMatch = text.match(naturalRegex);
-        const artificialMatch = text.match(artificialRegex);
+  // Loop through all matches
+  while ((match = breakdownRegex.exec(text)) !== null) {
+    labels.push(match[1]);
+    percentages.push(parseInt(match[2], 10));
+  }
 
-        const naturalPercentage = naturalMatch ? parseInt(naturalMatch[1], 10) : null;
-        const artificialPercentage = artificialMatch ? parseInt(artificialMatch[1], 10) : null;
-
-        return [
-          naturalPercentage,
-          artificialPercentage,
-        ];
+  return { labels, percentages };
       };
 
       const getMaterialPercentages = (text) => {
@@ -102,9 +103,16 @@ export default function EcoReportPage() {
       };
 
       const lightingPercentagesRaw = parsedData["Energy Efficiency"]["Lighting"]["Percentage Breakdown"];
-      const lightingPercentages = getLightingPercentages(lightingPercentagesRaw);
+      const { labels: lightLabels, percentages: lightPercentages } = getLightingPercentages(lightingPercentagesRaw);
       const materialPercentageRaw = parsedData["Resource Efficiency and Waste Management"]["Material Sustainability"]["Percentage Breakdown"]
-      const { labels: materialLabels, percentages: materialPercentages } = getMaterialPercentages(materialPercentageRaw);
+      let materialLabels = ['concrete','wood']
+      let materialPercentages = [75,25]
+      if(materialPercentageRaw != 'Unknown'){
+        const { labels: gotLabels, percentages: gotPercentages } = getMaterialPercentages(materialPercentageRaw);
+        materialLabels = gotLabels
+        materialPercentages = gotPercentages
+      }
+      
       
       setRatings({
         energyEfficiency: { 
@@ -123,9 +131,9 @@ export default function EcoReportPage() {
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Rating"],
         },
         location: {
-          transport: parsedData["Proximity to Public Transport"]["Rating"],
-          green: parsedData["Proximity to Green Spaces"]["Rating"],
-          overall: parsedData["Overall"]["Rating"],
+          transport: parsedData["Location"]["Proximity to Public Transport"]["Rating"],
+          green: parsedData["Location"]["Proximity to Green Spaces"]["Rating"],
+          overall: parsedData["Location"]["Overall"]["Rating"],
         },
         finalRating: "Green Advocate",
       });
@@ -133,7 +141,8 @@ export default function EcoReportPage() {
         energyEfficiency: {
           lighting: parsedData["Energy Efficiency"]["Lighting"]["Justification"],
           appliancesAndElectronics: parsedData["Energy Efficiency"]["Appliances and Electronics"]["Justification"],
-          percentages: lightingPercentages as number[],
+          percentages: lightPercentages as number[],
+          labels: lightLabels as string[],
           overall: parsedData["Energy Efficiency"]["Overall"]["Justification"],
         },
         indoorAirQuality: {
@@ -149,9 +158,9 @@ export default function EcoReportPage() {
           overall: parsedData["Resource Efficiency and Waste Management"]["Overall"]["Justification"],
         },
         location: {
-          transport: parsedData["Proximity to Public Transport"]["Justification"],
-          green: parsedData["Proximity to Green Spaces"]["Justification"],
-          overall: parsedData["Proximity to Green Spaces"]["Justification"],
+          transport: parsedData["Location"]["Proximity to Public Transport"]["Justification"],
+          green: parsedData["Location"]["Proximity to Green Spaces"]["Justification"],
+          overall: parsedData["Location"]["Proximity to Green Spaces"]["Justification"],
         },
       });
     }
@@ -177,7 +186,7 @@ const handleAskQuestion = () => {
         sub_2_just={infoCardContent.energyEfficiency.appliancesAndElectronics}
         // percentages={infoCardContent.energyEfficiency.percentages}
         percentages={infoCardContent.energyEfficiency.percentages}
-        labels={['Artificial Light', 'Natural Light']}
+        labels={infoCardContent.energyEfficiency.labels}
       />
       <InfoCard
         icon={AirQualityIcon}
@@ -222,13 +231,12 @@ const handleAskQuestion = () => {
         percentages={[30,40]}
         labels={["Number of Parks","Number of bus stops"]}
       />
-       {/* <button
+       <button
         onClick={handleAskQuestion}
-        className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 mt-4"
+        className="bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 mt-4 mx-auto"
       >
         Ask a Question
-      </button> */}
-      
+      </button>
     </div>
   );
 }

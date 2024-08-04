@@ -13,7 +13,7 @@ const QuestionPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000.234:5000/');
+    const newSocket = io('');
     setSocket(newSocket);
 
     return () => {
@@ -62,6 +62,15 @@ const QuestionPage = () => {
       });
     }
   }, [socket]);
+
+  useEffect(() => {
+    if (audioUrl) {
+      const audioElement = document.querySelector('audio');
+      if (audioElement) {
+        audioElement.src = audioUrl;
+      }
+    }
+  }, [audioUrl]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

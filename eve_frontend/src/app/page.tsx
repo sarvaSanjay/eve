@@ -11,7 +11,7 @@ const StartCommandPage = () => {
 
   useEffect(() => {
     // Create and set up the socket connection
-    const newSocket = io('http://100.66.219.234:5000/');
+    const newSocket = io('http://localhost:5000/');
     setSocket(newSocket);
 
     // Clean up the socket connection on component unmount
