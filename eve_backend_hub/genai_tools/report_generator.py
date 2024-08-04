@@ -8,6 +8,8 @@ import google.generativeai as genai
 
 class Report_Generator:
     def __init__(self):
+        GEMINI_KEY = os.environ.get("GOOGLE_API_KEY")
+        genai.configure(api_key=GEMINI_KEY)
         self.model = genai.GenerativeModel("gemini-1.5-flash")
         self.chat = None
         self.cwd = path.dirname(path.realpath(__file__))
@@ -55,13 +57,12 @@ class Report_Generator:
     def prompt_gemini(self):
         request = []
         for i in range(4):
-            with open(path.join(self.static, f"{i+1}.jpeg"), "rb") as f:
-                request.append(PIL.Image.open(f.read()))
+            request.append(PIL.Image.open(path.join(self.static, f"{i+1}.jpeg")))
         request.append("Generate your response for these images. Remember to follow the same pattern as your previous response")
         response = self.chat.send_message(request)
-        return response
+        return response.text
     
-    def parse_text(text):
+    def parse_text(self, text):
         lines = text.splitlines()
         result = {}
         current_section = None
@@ -124,7 +125,6 @@ class Report_Generator:
 
 
 if __name__ == '__main__':
-    GEMINI_KEY = os.environ.get("GOOGLE_API_KEY")
-    print(GEMINI_KEY)
-    genai.configure(api_key=GEMINI_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    rg = Report_Generator()
+    rg.one_shot_prompt()
+    print(rg.prompt_gemini())

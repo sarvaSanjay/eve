@@ -104,7 +104,7 @@ def get_image_data(frame):
 
 async def main():
     # Connect the client to the server
-    await sio.connect('http://100.66.219.234:5000')
+    await sio.connect('http://localhost:5000')
 
     # Wait for events indefinitely
     await sio.wait()
