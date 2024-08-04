@@ -1,83 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import InfoCard from '@/components/Energy';
-import EcoReport from '../components/HelloWorld';
-import {
-  Bolt as EnergyIcon,
-  Home as AirQualityIcon,
-  Recycling as WasteIcon,
-  LocationOn as LocationIcon,
-} from '@mui/icons-material';
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import io from 'socket.io-client';
 
-export default function Home() {
-  const [ecoChampion, setEcoChampion] = useState('');
-  const [ratings, setRatings] = useState({
-    energyEfficiency: '',
-    indoorAirQuality: '',
-    wasteManagement: '',
-    locationAnalysis: ''
-  });
-  const [infoCardContent, setInfoCardContent] = useState({
-    energyEfficiency: '',
-    indoorAirQuality: '',
-    wasteManagement: '',
-    locationAnalysis: '',
-    userRating: ''
-  });
-  const [averageRatings, setAverageRatings] = useState({
-    avgEnergyEfficiency: '',
-    avgIndoorAirQuality: '',
-    avgWasteManagement: '',
-    avgLocationAnalysis: ''
-  });
+const StartCommandPage = () => {
+  const [socket, setSocket] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const socket = io('http://100.66.219.234:5000/'); // Replace with your server URL
+    // Create and set up the socket connection
+    const newSocket = io('http://100.66.219.234:5000/');
+    setSocket(newSocket);
 
-    socket.on('connect', () => {
-      console.log('Connected to WebSocket');
-    });
-
-    socket.on('eco-report', (data) => {
-      setEcoChampion(data.ecoChampion);
-      setRatings(data.ratings);
-      setInfoCardContent(data.infoCards);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Disconnected from WebSocket');
-    });
-
+    // Clean up the socket connection on component unmount
     return () => {
-      socket.disconnect();
+      newSocket.disconnect();
     };
   }, []);
+
+  const handleStartRobot = () => {
+    if (socket) {
+      socket.emit('send_command', { command: 'start_robot' });
+
+      socket.once('send_echo_report', (data) => {
+        // Convert data to a JSON string and navigate
+        const queryString = `data=${encodeURIComponent(JSON.stringify(data))}`;
+        router.push(`/eco-report?${queryString}`);
+      });
+    }
+  };
+
   return (
-    <div>
-      <EcoReport ecoChampion={ecoChampion} ratings={ratings}/>
-      <InfoCard
-        icon={EnergyIcon}
-        title="ENERGY EFFICIENCY"
-        content={infoCardContent.energyEfficiency || "Loading..."}
-      />
-      <InfoCard
-        icon={AirQualityIcon}
-        title="INDOOR AIR QUALITY"
-        content={infoCardContent.indoorAirQuality || "Loading..."}
-      />
-
-      <InfoCard
-        icon={WasteIcon}
-        title="RESOURCE AND WASTE MANAGEMENT"
-        content={infoCardContent.wasteManagement || "Loading..."}
-      />
-
-      <InfoCard
-        icon={LocationIcon}
-        title="LOCATION ANALYSIS"
-        content={infoCardContent.locationAnalysis || "Loading..."}
-      />
-      
+    <div className="flex items-center justify-center min-h-screen bg-green-50">
+      <div className="text-center bg-white p-8 rounded-lg shadow-lg border border-green-200">
+        <h1 className="text-2xl font-bold mb-6 text-green-800">Start Robot</h1>
+        <button
+          onClick={handleStartRobot}
+          className="bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300"
+        >
+          Start Robot
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default StartCommandPage;

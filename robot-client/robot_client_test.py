@@ -4,9 +4,14 @@ import asyncio
 import base64
 import socketio
 import socket
+from concurrent.futures import ThreadPoolExecutor
+
 
 # Define a unique robot ID
 robot_id = "robot123"
+
+recv_buffer = b""
+end_char =  b"\0"
 
 # Create a Socket.IO client instance
 sio = socketio.AsyncClient()
@@ -21,59 +26,49 @@ print("Waiting for EV3 client connection...")
 (clientsocket, address) = serversocket.accept()
 print("Connected to EV3 client at", address)
 
+executor = ThreadPoolExecutor(max_workers=1)
 
 # Define event handlers for the client
-
 @sio.event
 async def connect():
     print("Connected to the server.")
-    # Register the robot with the server after connecting
     await sio.emit('connect_robot', {'robot_id': robot_id})
-
 
 @sio.event
 async def disconnect():
     print("Disconnected from the server.")
 
-
 @sio.on("robot_registered")
 async def robot_registered(data):
     print(f"message: {data.get('message')}")
-
 
 @sio.on("browser_connected")
 async def browser_connected(data):
     print(f"message: {data.get('message')}")
 
-
 img_num = 0
-
 
 @sio.on('execute_command')
 async def on_execute_command(data):
     global img_num
-    # Handle the 'execute_command' event sent from the server
     command = data.get('command')
     print(f"Executing command: {command}")
-    # Execute the command (replace with actual command handling logic)
     if command == 'start_robot':
-        clientsocket.sendall("start_robot".encode())
+        write_to_client(clientsocket, "start_robot")
 
     result = f"Command '{command}' executed"
-
-    # Optionally, send the result back to the server
-    # sio.emit('command_result', {'robot_id': robot_id, 'result': result})
     print(result)
-
 
 async def capture_images():
     global img_num
     pipeline = depthai.Pipeline()
-    # Color stream
     cam_rgb = pipeline.createColorCamera()
-    cam_rgb.setPreviewSize(300, 300)
+    cam_rgb.setPreviewSize(1920, 1080)
     cam_rgb.setInterleaved(False)
-
+    
+    cam_rgb.initialControl.setSharpness(0)     # range: 0..4, default: 1
+    cam_rgb.initialControl.setLumaDenoise(0)   # range: 0..4, default: 1
+    cam_rgb.initialControl.setChromaDenoise(4) # range: 0..4, default: 1
     xout_rgb = pipeline.createXLinkOut()
     xout_rgb.setStreamName("rgb")
 
@@ -85,47 +80,80 @@ async def capture_images():
         q_rgb = device.getOutputQueue("rgb")
         img_num += 1
         in_rgb = q_rgb.get()
-        print("in_rgb")
-        print(in_rgb)
         if in_rgb is not None:
             frame = in_rgb.getCvFrame()
             encoded_image = get_image_data(frame)
             await sio.emit('robot_send_image', {'index': img_num, 'image_data': encoded_image})
 
-
 async def handle_ev3_client(clientsocket):
+    print('Started handle_ev3_client function')
     while True:
         try:
-            data = clientsocket.recv(1024)
-            if not data:
+            loop = asyncio.get_event_loop()
+            message = await loop.run_in_executor(executor, read_from_client, clientsocket)
+            if not message:
                 continue
-            message = data.decode()
             print("Received from EV3 client:", message)
             if message == 'Take a picture':
-                # Trigger image capture directly
                 await capture_images()
-                # Send acknowledgment back to EV3 client
-                clientsocket.sendall("Picture taken".encode())
-            if message == 'Robot Stopped':
+                write_to_client(clientsocket, "Picture taken")
+            elif message == 'Robot Stopped':
                 await sio.emit('robot_stopped', 'Robot Stopped')
         except Exception as e:
             print("Error handling EV3 client:", e)
-
 
 def get_image_data(frame):
     _, buffer = cv2.imencode('.jpeg', frame)
     encoded_image = base64.b64encode(buffer).decode('utf-8')
     return encoded_image
 
+def write_to_client(client_socket, message):
+    try:
+        total = 0
+        msg = message.encode() + end_char
+        while total < len(msg):
+            sent = client_socket.send(msg[total:])
+            if sent == 0:
+                raise RuntimeError("Socket connection broken")
+            total += sent
+        print("Message sent to server - " + message)     
+    except ConnectionError as e:
+        print("Unable to connect to the server:", str(e))
+    except Exception as e:
+        print("An error occurred:", str(e))
+
+def read_from_client(client_socket):
+    try:
+        global recv_buffer
+        while end_char not in recv_buffer:
+            chunk = client_socket.recv(1024)
+            if chunk == b"":
+                raise RuntimeError("Socket connection broken")
+            recv_buffer += chunk
+        end_char_loc = recv_buffer.index(end_char)
+        msg = recv_buffer[:end_char_loc]
+        recv_buffer = recv_buffer[end_char_loc + 1:]
+        return msg.decode()
+    except ConnectionError as e:
+        print("Unable to connect to the server:", str(e))
+    except Exception as e:
+        print("An error occurred:", str(e))
 
 async def main():
-    # Connect the client to the server
-    await sio.connect('http://100.66.219.234:5000')
+    try:
+        # Connect the client to the server
+        await sio.connect('http://100.66.219.234:5000')
+        print("Socket.IO client connected")
 
-    asyncio.create_task(handle_ev3_client(clientsocket))
+        # Create tasks for handling the Socket.IO client and the EV3 client
+        tasks = [
+            asyncio.create_task(sio.wait()),  # Handle Socket.IO events
+            asyncio.create_task(handle_ev3_client(clientsocket))  # Handle EV3 client
+        ]
 
-    # Wait for events indefinitely
-    await sio.wait()
-
+        # Wait for both tasks to complete
+        await asyncio.gather(*tasks)
+    except Exception as e:
+        print(f"Error in main: {e}")
 
 asyncio.run(main())

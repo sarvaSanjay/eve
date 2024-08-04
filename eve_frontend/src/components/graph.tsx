@@ -1,28 +1,38 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip } from 'recharts';
+import { LinearGradient, Stop, Defs } from 'recharts';
 
-const GradientBarChart = ({ averageRating, userRating }) => {
-  const data = [
-    { name: 'Average', value: averageRating },
-    { name: 'Your Rating', value: userRating }
-  ];
 
+
+const data = [
+  { subject: 'Energy Efficiency', A: 120, B: 70 },
+  { subject: 'Indoor Air Quality', A: 98, B: 50 },
+  { subject: 'Resource & Waste Management', A: 86, B: 65 },
+  { subject: 'Location Analysis', A: 99, B: 40 },
+];
+
+const RadarChartComponent = () => {
+  console.log(data)
   return (
-    <BarChart width={300} height={150} data={data}>
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
-      <YAxis />
+    <RadarChart outerRadius={90} width={730} height={250} data={data}>
+      <Defs>
+        <LinearGradient id="colorA" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="5%" stopColor="#283240" stopOpacity={0} />
+          <Stop offset="95%" stopColor="#283240" stopOpacity={0} />
+        </LinearGradient>
+        <LinearGradient id="colorB" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="5%" stopColor="#324630" stopOpacity={0} />
+          <Stop offset="95%" stopColor="#324630" stopOpacity={0} />
+        </LinearGradient>
+      </Defs>
+      <PolarGrid />
+      <PolarAngleAxis dataKey="subject" />
+      <PolarRadiusAxis angle={30} domain={[0, 150]} />
+      <Radar name="Your Room's Score" dataKey="A" stroke="#3e4a5f" fill="url(#colorA)" fillOpacity={0.6} />
+      <Radar name="Average Room in Ontario's Score" dataKey="B" stroke="#4a6a40" fill="url(#colorB)" fillOpacity={0.6} />
       <Tooltip />
-      <Legend />
-      <defs>
-        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#ff7e5f', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: '#feb47b', stopOpacity: 1 }} />
-        </linearGradient>
-      </defs>
-      <Bar dataKey="value" fill="url(#gradient)" />
-    </BarChart>
+    </RadarChart>
   );
 };
 
-export default GradientBarChart;
+export default RadarChartComponent;
