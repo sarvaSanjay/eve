@@ -5,7 +5,7 @@ import PIL.Image
 import google.generativeai as genai
 
 
-class Report_Generator:
+class ReportGenerator:
     def __init__(self):
         GEMINI_KEY = os.environ.get("GOOGLE_API_KEY")
         genai.configure(api_key=GEMINI_KEY)
