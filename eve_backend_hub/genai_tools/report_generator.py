@@ -1,5 +1,6 @@
 import os
 from os import path
+import json
 
 import PIL.Image
 import google.generativeai as genai
@@ -7,6 +8,8 @@ import google.generativeai as genai
 
 class Report_Generator:
     def __init__(self):
+        GEMINI_KEY = os.environ.get("GOOGLE_API_KEY")
+        genai.configure(api_key=GEMINI_KEY)
         self.model = genai.GenerativeModel("gemini-1.5-flash")
         self.chat = None
         self.cwd = path.dirname(path.realpath(__file__))
@@ -54,14 +57,74 @@ class Report_Generator:
     def prompt_gemini(self):
         request = []
         for i in range(4):
-            with open(path.join(self.static, f"{i+1}.jpeg"), "rb") as f:
-                request.append(PIL.Image.open(f.read()))
+            request.append(PIL.Image.open(path.join(self.static, f"{i+1}.jpeg")))
         request.append("Generate your response for these images. Remember to follow the same pattern as your previous response")
         response = self.chat.send_message(request)
-        return response
+        return response.text
+    
+    def parse_text(self, text):
+        lines = text.splitlines()
+        result = {}
+        current_section = None
+        current_subsection = None
+        in_subsection = False
+
+        for line in lines:
+            line = line.strip()
+
+            if line.endswith(':') and not line.startswith('- '):
+                # Handle sections
+                current_section = line[:-1]
+                result[current_section] = {}
+                in_subsection = False
+            elif line.startswith('- '):
+                # Handle subsections
+                line = line[2:].strip()
+                if line.endswith(':'):
+                    current_subsection = line[:-1].strip()
+                    result[current_section][current_subsection] = {}
+                    in_subsection = True
+                else:
+                    key, value = line.split(': ', 1)
+                    if in_subsection:
+                        result[current_section][current_subsection][key] = value
+                    else:
+                        result[current_section][key] = value
+            elif line.startswith('    - '):
+                # Handle nested subsections
+                line = line[6:].strip()
+                key, value = line.split(': ', 1)
+                if in_subsection:
+                    result[current_section][current_subsection][key] = value
+                else:
+                    result[current_section][key] = value
+            elif line.startswith('        - '):
+                # Handle further nesting if necessary
+                line = line[8:].strip()
+                key, value = line.split(': ', 1)
+                if in_subsection:
+                    result[current_section][current_subsection][key] = value
+                else:
+                    result[current_section][key] = value
+            elif line == 'Final Rating:':
+                current_section = 'Final Rating'
+                result[current_section] = {}
+                in_subsection = False
+            elif line.startswith('Justification:'):
+                # Handle justification
+                value = line[13:].strip()
+                if current_section == 'Final Rating':
+                    result[current_section]['Justification'] = value
+                elif in_subsection:
+                    result[current_section][current_subsection]['Justification'] = value
+                else:
+                    result[current_section]['Justification'] = value
+
+        json_data = json.dumps(result, indent=4)
+        return json_data
+
 
 if __name__ == '__main__':
-    GEMINI_KEY = os.environ.get("GOOGLE_API_KEY")
-    print(GEMINI_KEY)
-    genai.configure(api_key=GEMINI_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    rg = Report_Generator()
+    rg.one_shot_prompt()
+    print(rg.prompt_gemini())

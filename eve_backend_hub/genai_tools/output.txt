@@ -1,16 +1,14 @@
 Energy Efficiency:
-- Lighting:
-    - Rating: Good
-    - Justification: The room utilizes a mix of natural and artificial lighting. While the presence of large windows allows for some natural light penetration, the reliance on fluorescent lights indicates a moderate reliance on artificial sources. The lighting systems seem to be standard fixtures, not necessarily energy-efficient LED lights.
-    - Percentage Breakdown: 
-        - Natural: 20%
-        - Artificial: 80%
-- Appliances and Electronics:
-    - Rating: Good
-    - Justification: The room includes a flat-screen TV, likely an energy-efficient model. The presence of a printer and a large cabinet indicates potential for other electronic devices and appliances. Without further details on the energy efficiency of these appliances, it's difficult to definitively assess their impact.
-- Overall:
-    - Rating: Good
-    - Justification: The room demonstrates a moderate focus on energy efficiency, with a mix of natural and artificial lighting and likely energy-efficient electronics. However, the lack of clear information on lighting types and appliance energy ratings restricts a higher score.
+    - Lighting:
+        - Rating: Good
+        - Justification: The room utilizes a mix of natural and artificial lighting. While the presence of large windows allows for some natural light penetration, the reliance on fluorescent lights indicates a moderate reliance on artificial sources. The lighting systems seem to be standard fixtures, not necessarily energy-efficient LED lights.
+        - Percentage Breakdown: Natural: 20%, Artificial: 80%
+    - Appliances and Electronics:
+        - Rating: Good
+        - Justification: The room includes a flat-screen TV, likely an energy-efficient model. The presence of a printer and a large cabinet indicates potential for other electronic devices and appliances. Without further details on the energy efficiency of these appliances, it's difficult to definitively assess their impact.
+    - Overall:
+        - Rating: Good
+        - Justification: The room demonstrates a moderate focus on energy efficiency, with a mix of natural and artificial lighting and likely energy-efficient electronics. However, the lack of clear information on lighting types and appliance energy ratings restricts a higher score.
 
 Indoor Air Quality:
     - Air Quality:
@@ -27,9 +25,7 @@ Resource Efficiency and Waste Management:
     - Material Sustainability:
         - Rating: Poor
         - Justification: The images show a standard room with no visible signs of recycled or sustainably sourced materials. The use of typical concrete, carpet, and painted walls does not indicate any specific efforts towards sustainable material choices.
-        - Percentage Breakdown:
-            - Concrete: 90%
-            - Glass: 10%
+        - Percentage Breakdown: Concrete: 90%, Glass: 10%
     - Waste Management:
         - Rating: Good
         - Justification: The presence of a designated recycling bin demonstrates a basic commitment to waste management. The room's design could also be evaluated for other waste management strategies, such as composting bins or dedicated disposal areas for different waste streams.
